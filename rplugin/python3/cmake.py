@@ -63,7 +63,7 @@ class Main(object):
         if self.comp_data_bear.is_file():
             subprocess.call( ["rm", str( comp_data_bear ) ] )
 
-        for path in old_cmake_files:
+        for path in self.old_cmake_files:
             if path.is_file():
                 subprocess.call(["rm", str( path )])
 
