@@ -15,7 +15,6 @@ class Main(object):
         self.comp_data_cmake = Path("build/compile_commands.json")
         self.comp_data_bear = Path("compile_commands.json")
 
-
     def run_cmake(self):
         try:
             subprocess.call( ["mkdir", "build"] )
@@ -24,13 +23,13 @@ class Main(object):
             raise
         try:
             subprocess.call( ["cmake", "-DCMAKE_EXPORT_COMPILE_COMMANDS=1", ".."], cwd="build" )
-        except:
+        except OSError:
             self.vim.command('echo "CMake Failed."')
             raise
         if self.comp_data_cmake.is_file():
             try:
                 subprocess.call( ["rdm", "--silent", "--daemon"], cwd=".." )
-            except:
+            except OSError:
                 self.vim.command('echo "Couldn\'t start the RTags daemon."')
                 raise
             subprocess.call( ["rc", "-J", "build"] )
