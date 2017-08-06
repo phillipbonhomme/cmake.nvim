@@ -17,30 +17,30 @@ class Main(object):
 
     def run_cmake(self):
         try:
-            subprocess.call( ["mkdir", "build"] )
+            spcall( ["mkdir", "build"] )
         except OSError:
             self.vim.command('echo "Can\'t setup CMake build directory."')
             raise
         try:
             self.vim.command('echo "Running CMake..."')
-            subprocess.call( ["cmake", "-DCMAKE_EXPORT_COMPILE_COMMANDS=1", ".."], cwd="build" )
+            spcall( ["cmake", "-DCMAKE_EXPORT_COMPILE_COMMANDS=1", ".."], cwd="build" )
         except OSError:
             self.vim.command('echo "CMake Failed."')
             raise
         if self.comp_data_cmake.is_file():
             try:
-                subprocess.call( ["rdm", "--silent", "--daemon"], cwd=".." )
+                spcall( ["rdm", "--silent", "--daemon"], cwd=".." )
             except OSError:
                 self.vim.command('echo "Couldn\'t start the RTags daemon."')
                 raise
-            subprocess.call( ["rc", "-J", "build"] )
+            spcall( ["rc", "-J", "build"] )
         else:
             self.vim.command('echo "Error Generating Compilation Database With CMake"')
             raise
 
 #    def run_bear(self):
 #        try:
-#            subprocess.call(["bear", "make"])
+#            spcall(["bear", "make"])
 #        except OSError as e:
 #            if e.errno == os.errno.ENOENT:
 #                self.vim.command('echo "No Makefile for Bear to Use"')
@@ -48,8 +48,8 @@ class Main(object):
 #                self.vim.command('echo "Bear Error"')
 #            raise
 #        if self.comp_data_bear.is_file():
-#            subprocess.call(["rdm", "--log-file=$HOME/dev/logs/rdm.log", "--silent", "--daemon"])
-#            subprocess.call(["rc", "-J", "."])
+#            spcall(["rdm", "--log-file=$HOME/dev/logs/rdm.log", "--silent", "--daemon"])
+#            spcall(["rc", "-J", "."])
 #        else:
 #            self.vim.command('echo "Error Generating Compilation Database With Bear"')
 #
@@ -58,19 +58,19 @@ class Main(object):
         self.vim.command('echo "Starting CMake Project"')
 
         if self.old_cmake_dir.is_dir():
-            subprocess.call( ["rm", "-rf", str( old_cmake_dir ) ] )
+            spcall( ["rm", "-rf", str( old_cmake_dir ) ] )
 
         if self.comp_data_bear.is_file():
-            subprocess.call( ["rm", str( comp_data_bear ) ] )
+            spcall( ["rm", str( comp_data_bear ) ] )
 
         for path in self.old_cmake_files:
             if path.is_file():
-                subprocess.call(["rm", str( path )])
+                spcall(["rm", str( path )])
 
         if self.cmake_proj.is_file():
             if self.build_dir.is_dir():
                 self.vim.command('echo "Cleaning up Build Directory"')
-                subprocess.call(["rm", "-rf", "build"])
+                spcall(["rm", "-rf", "build"])
             self.vim.command('echo "Running CMake"')
             self.run_cmake()
         else:
