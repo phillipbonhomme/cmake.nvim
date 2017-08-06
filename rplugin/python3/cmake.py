@@ -1,7 +1,7 @@
 import neovim
 from pathlib import Path
-import subprocess
-import os
+import subprocess.call as spcall
+#import os
 
 @neovim.plugin
 class Main(object):
@@ -22,6 +22,7 @@ class Main(object):
             self.vim.command('echo "Can\'t setup CMake build directory."')
             raise
         try:
+            self.vim.command('echo "Running CMake..."')
             subprocess.call( ["cmake", "-DCMAKE_EXPORT_COMPILE_COMMANDS=1", ".."], cwd="build" )
         except OSError:
             self.vim.command('echo "CMake Failed."')
@@ -37,21 +38,21 @@ class Main(object):
             self.vim.command('echo "Error Generating Compilation Database With CMake"')
             raise
 
-    def run_bear(self):
-        try:
-            subprocess.call(["bear", "make"])
-        except OSError as e:
-            if e.errno == os.errno.ENOENT:
-                self.vim.command('echo "No Makefile for Bear to Use"')
-            else:
-                self.vim.command('echo "Bear Error"')
-            raise
-        if self.comp_data_bear.is_file():
-            subprocess.call(["rdm", "--log-file=$HOME/dev/logs/rdm.log", "--silent", "--daemon"])
-            subprocess.call(["rc", "-J", "."])
-        else:
-            self.vim.command('echo "Error Generating Compilation Database With Bear"')
-
+#    def run_bear(self):
+#        try:
+#            subprocess.call(["bear", "make"])
+#        except OSError as e:
+#            if e.errno == os.errno.ENOENT:
+#                self.vim.command('echo "No Makefile for Bear to Use"')
+#            else:
+#                self.vim.command('echo "Bear Error"')
+#            raise
+#        if self.comp_data_bear.is_file():
+#            subprocess.call(["rdm", "--log-file=$HOME/dev/logs/rdm.log", "--silent", "--daemon"])
+#            subprocess.call(["rc", "-J", "."])
+#        else:
+#            self.vim.command('echo "Error Generating Compilation Database With Bear"')
+#
     @neovim.function('CMakeCompDB')
     def cMakeCompDB(self, args):
         self.vim.command('echo "Starting CMake Project"')
