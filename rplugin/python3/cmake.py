@@ -7,6 +7,14 @@ import os
 class Main(object):
     def __init__(self, vim):
         self.vim = vim
+        self.old_cmake_files = [ Path("CMakeCache.txt"), Path("cmake_install.cmake") ]
+        self.old_cmake_dir = Path("CMakeFiles")
+        self.cmake_proj = Path("CMakeLists.txt")
+        self.makefile = Path("Makefile")
+        self.build_dir = Path("build")
+        self.comp_data_cmake = Path("build/compile_commands.json")
+        self.comp_data_bear = Path("compile_commands.json")
+
 
     def run_cmake(self):
         try:
@@ -19,7 +27,7 @@ class Main(object):
         except:
             self.vim.command('echo "CMake Failed."')
             raise
-        if comp_data_cmake.is_file():
+        if self.comp_data_cmake.is_file():
             try:
                 subprocess.call( ["rdm", "--silent", "--daemon"], cwd=".." )
             except:
@@ -39,7 +47,7 @@ class Main(object):
             else:
                 self.vim.command('echo "Bear Error"')
             raise
-        if comp_data_bear.is_file():
+        if self.comp_data_bear.is_file():
             subprocess.call(["rdm", "--log-file=$HOME/dev/logs/rdm.log", "--silent", "--daemon"])
             subprocess.call(["rc", "-J", "."])
         else:
@@ -49,33 +57,25 @@ class Main(object):
     def CMakeCompDB(self, args):
         self.vim.command('echo "Starting CMake Project"')
 
-        old_cmake_files = [ Path("CMakeCache.txt"), Path("cmake_install.cmake") ]
-        old_cmake_dir = Path("CMakeFiles")
-        cmake_proj = Path("CMakeLists.txt")
-        makefile = Path("Makefile")
-        build_dir = Path("build")
-        comp_data_cmake = Path("build/compile_commands.json")
-        comp_data_bear = Path("compile_commands.json")
-
-        if old_cmake_dir.is_dir():
+        if self.old_cmake_dir.is_dir():
             subprocess.call( ["rm", "-rf", str( old_cmake_dir ) ] )
 
-        if comp_data_bear.is_file():
+        if self.comp_data_bear.is_file():
             subprocess.call( ["rm", str( comp_data_bear ) ] )
 
         for path in old_cmake_files:
             if path.is_file():
                 subprocess.call(["rm", str( path )])
 
-        if cmake_proj.is_file():
-            if build_dir.is_dir():
+        if self.cmake_proj.is_file():
+            if self.build_dir.is_dir():
                 self.vim.command('echo "Cleaning up Build Directory"')
                 subprocess.call(["rm", "-rf", "build"])
             self.vim.command('echo "Running CMake"')
             self.run_cmake()
         else:
             self.vim.command('echo "Not a CMake Project"')
-            if makefile.is_file():
+            if self.makefile.is_file():
                 self.run_bear()
             else:
                 self.vim.command('echo "Not Setup for Autotools Either"')
