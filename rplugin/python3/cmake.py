@@ -12,22 +12,22 @@ class Main(object):
         try:
             subprocess.call( ["mkdir", "build"] )
         except OSError:
-            print('Can\'t setup CMake build directory.')
+            self.vim.command('echo "Can\'t setup CMake build directory."')
             raise
         try:
             subprocess.call( ["cmake", "-DCMAKE_EXPORT_COMPILE_COMMANDS=1", ".."], cwd="build" )
         except:
-            print('CMake Failed.')
+            self.vim.command('echo "CMake Failed."')
             raise
         if comp_data_cmake.is_file():
             try:
                 subprocess.call( ["rdm", "--silent", "--daemon"], cwd=".." )
             except:
-                print('Couldn\'t start the RTags daemon.')
+                self.vim.command('echo "Couldn\'t start the RTags daemon."')
                 raise
             subprocess.call( ["rc", "-J", "build"] )
         else:
-            print('Error Generating Compilation Database With CMake')
+            self.vim.command('echo "Error Generating Compilation Database With CMake"')
             raise
 
     def run_bear(self):
@@ -35,15 +35,15 @@ class Main(object):
             subprocess.call(["bear", "make"])
         except OSError as e:
             if e.errno == os.errno.ENOENT:
-                print('No Makefile for Bear to Use')
+                self.vim.command('echo "No Makefile for Bear to Use"')
             else:
-                print('Bear Error')
+                self.vim.command('echo "Bear Error"')
             raise
         if comp_data_bear.is_file():
             subprocess.call(["rdm", "--log-file=$HOME/dev/logs/rdm.log", "--silent", "--daemon"])
             subprocess.call(["rc", "-J", "."])
         else:
-            print('Error Generating Compilation Database With Bear')
+            self.vim.command('echo "Error Generating Compilation Database With Bear"')
 
     @neovim.function('CMakeCompDB')
     def CMakeCompDB(self, args):
@@ -69,14 +69,14 @@ class Main(object):
 
         if cmake_proj.is_file():
             if build_dir.is_dir():
-                print('Cleaning up Build Directory')
+                self.vim.command('echo "Cleaning up Build Directory"')
                 subprocess.call(["rm", "-rf", "build"])
-            print('Running CMake')
+            self.vim.command('echo "Running CMake"')
             self.run_cmake()
         else:
-            print('Not a CMake Project')
+            self.vim.command('echo "Not a CMake Project"')
             if makefile.is_file():
                 self.run_bear()
             else:
-                print('Not Setup for Autotools Either')
+                self.vim.command('echo "Not Setup for Autotools Either"')
 
