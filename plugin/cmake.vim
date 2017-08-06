@@ -1,6 +1,8 @@
-let GetCompDB = function('CMakeCompDB')
+function! GetCompDB()
+    exec CMakeCompDB()
+endfunc
 let g:neomake_cmakecompdb_maker = {
-    \ 'exe': 'GetCompDB',
+    \ 'exe': function('GetCompDB'),
     \ 'args': [''] 
     \ }
 noremap <unique> <Plug>NeomakeCompDB :Neomake! cmakecompdb<CR>
