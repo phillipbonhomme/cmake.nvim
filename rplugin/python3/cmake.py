@@ -8,7 +8,7 @@ class Main(object):
     def __init__(self, vim):
         self.vim = vim
 
-    def run_cmake():
+    def run_cmake(self):
         try:
             subprocess.call( ["mkdir", "build"] )
         except OSError:
@@ -30,7 +30,7 @@ class Main(object):
             print('Error Generating Compilation Database With CMake')
             raise
 
-    def run_bear():
+    def run_bear(self):
         try:
             subprocess.call(["bear", "make"])
         except OSError as e:
@@ -72,11 +72,11 @@ class Main(object):
                 print('Cleaning up Build Directory')
                 subprocess.call(["rm", "-rf", "build"])
             print('Running CMake')
-            run_cmake()
+            self.run_cmake()
         else:
             print('Not a CMake Project')
             if makefile.is_file():
-                run_bear()
+                self.run_bear()
             else:
                 print('Not Setup for Autotools Either')
 
