@@ -1,8 +1,9 @@
-let g:neomake_cmpcmddb_maker = {
-    \ 'exe': 'CMakeCompDB',
+let GetCompDB = function('CMakeCompDB')
+let g:neomake_cmakecompdb_maker = {
+    \ 'exe': 'GetCompDB',
     \ 'args': [''] 
     \ }
-noremap <unique> <Plug>NeomakeCompDB :Neomake! cmpcmddb<CR>
+noremap <unique> <Plug>NeomakeCompDB :Neomake! cmakecompdb<CR>
 function CMakeTargets()
     echo "Get CMake Targets"
 endfunction
