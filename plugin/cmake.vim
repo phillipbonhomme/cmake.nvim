@@ -8,10 +8,10 @@ let funccmakecompdb = string(FnCMakeCompDB)
 "   let self.fn = function('GetCompDB')
 "endfunction
 let g:neomake_cmakecompdb_maker = {
-    \ 'exe': funccmakecompdb,
+    \ 'exe': 'funccmakecompdb',
     \ 'args': [''] 
     \ }
 noremap <unique> <Plug>NeomakeCompDB :Neomake! cmakecompdb<CR>
-function CMakeTargets()
+function! CMakeTargets()
     echo "Get CMake Targets"
 endfunction
