@@ -54,7 +54,7 @@ class Main(object):
             self.vim.command('echo "Error Generating Compilation Database With Bear"')
 
     @neovim.function('CMakeCompDB')
-    def CMakeCompDB(self, args):
+    def cMakeCompDB(self, args):
         self.vim.command('echo "Starting CMake Project"')
 
         if self.old_cmake_dir.is_dir():
