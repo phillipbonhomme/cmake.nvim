@@ -12,7 +12,7 @@
 "    \ 'exe': string(FnCMakeCompDB),
 "    \ 'args': [''] 
 "    \ }
-nmap <unique> <Plug>GenerateCompDB :exec CMakeCompDB()<CR>
+nnoremap <unique> <Plug>GenerateCompDB :exec CMakeCompDB()<CR>
 function! CMakeTargets()
     echo "Get CMake Targets"
 endfunction
