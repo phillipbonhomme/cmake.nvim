@@ -26,7 +26,7 @@ cmake_build_info = {
 cmake_cmd_info = {
     "cmake_cmd": ["cmake", "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON", ".."],
     "rdm_cmd": ["rdm", "--silent", "--daemon"],
-    "rc_cmd": ["rc", "-J", "build"]}
+    "rc_cmd": ["rc", "-J", str(cmake_build_info["build_dir"])]}
 
 
 @neovim.plugin
@@ -34,7 +34,7 @@ class CMake(object):
     def __init__(self, vim):
         self.vim = vim
 
-    def removeDirtyDir():
+    def removeDirtyDir(self):
         if cmake_build_info["old_cmake_dir"].is_dir():
             self.vim.command('echo "Cleaning up Old CMake Directory"')
             subprocess.call(
@@ -44,7 +44,7 @@ class CMake(object):
             subprocess.call(
                 ["rm", "-rf", str(cmake_build_info["build_dir"])])
 
-    def removeOldCMakeFiles():
+    def removeOldCMakeFiles(self):
         for path in cmake_build_info["old_cmake_files"]:
             if path.is_file():
                 self.vim.command('echo "Cleaning up Old CMake Files"')
