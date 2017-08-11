@@ -96,7 +96,7 @@ class CMake(object):
     def cMakeCompDB(self, args):
 
         if cmake_build_info["build_dir"].is_dir():
-            removeDirtyDir()
+            self.removeDirtyDir()
 
         if cmake_build_info["cmake_proj"].is_file():
             self.vim.command('echo "Starting CMake Project"')
@@ -105,4 +105,3 @@ class CMake(object):
             self.connect_rtags_client()
         else:
             self.vim.command('echo "Not a CMake Project"')
-
