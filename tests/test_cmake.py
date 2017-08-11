@@ -12,7 +12,7 @@ import subprocess
 class TestCMake(utTestCase):
     def setUp(self):
         print("Setup for CMake unit test")
-        #self.cmake_plugin = cmake.CMake(nvim)
+        #self.cmake_plugin = cmake.Main(nvim)
 
     def tearDown(self):
         print("Teardown for CMake unit test")
