@@ -92,8 +92,8 @@ class CMake(object):
             self.vim.command(
                 'echo "Error Generating Compilation Database With CMake"')
 
-    @neovim.function('CMakeCompDB')
-    def cMakeCompDB(self, args):
+    @neovim.function('CMakeCompDB', sync=True)
+    def CMakeCompDB(self):
 
         if cmake_build_info["build_dir"].is_dir():
             self.removeDirtyDir()
