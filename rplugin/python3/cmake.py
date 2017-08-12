@@ -7,32 +7,40 @@ cmake_build_info = {
         Path("CMakeCache.txt"),
         Path("cmake_install.cmake"),
         Path("Makefile"),
-        Path("compile_commands.json")],
-    "old_cmake_dir": Path("CMakeFiles"),
-    "cmake_proj": Path("CMakeLists.txt"),
-    "build_dir": Path("build"),
-    "comp_data_cmake": Path("build/compile_commands.json")}
+        Path("compile_commands.json")
+    ],
+    "old_cmake_dir":
+    Path("CMakeFiles"),
+    "cmake_proj":
+    Path("CMakeLists.txt"),
+    "build_dir":
+    Path("build"),
+    "comp_data_cmake":
+    Path("build/compile_commands.json")
+}
 
 cmake_cmd_info = {
     "cmake_cmd": ["cmake", "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON", ".."],
     "rdm_cmd": ["rdm", "--silent", "--daemon"],
-    "rc_cmd": ["rc", "-J", str(cmake_build_info["build_dir"])]}
+    "rc_cmd": ["rc", "-J", str(cmake_build_info["build_dir"])]
+}
+
 
 def removeDirtyDir(args):
     if cmake_build_info["build_dir"].is_dir():
         print('echo "Cleaning up Build Directory"')
-        subprocess.call(
-            ["rm", "-rf", str(cmake_build_info["build_dir"])])
+        subprocess.call(["rm", "-rf", str(cmake_build_info["build_dir"])])
+
 
 def removeOldCMakeFiles(args):
     if cmake_build_info["old_cmake_dir"].is_dir():
         print('echo "Cleaning up Old CMake Directory"')
-        subprocess.call(
-            ["rm", "-rf", str(cmake_build_info["old_cmake_dir"])])
+        subprocess.call(["rm", "-rf", str(cmake_build_info["old_cmake_dir"])])
     for path in cmake_build_info["old_cmake_files"]:
         if path.is_file():
             print('echo "Cleaning up Old CMake Files"')
             subprocess.call(["rm", str(path)])
+
 
 def run_cmake(args):
     print('echo "Running CMake"')
@@ -50,9 +58,9 @@ def run_cmake(args):
         print('echo "CMake Failed."')
         raise
     else:
-        print(
-            'echo "Error Generating Compilation Database With CMake"')
+        print('echo "Error Generating Compilation Database With CMake"')
         raise
+
 
 def setup_rtags_daemon(args):
     print('echo "Initializing RTags Daemon"')
@@ -62,6 +70,7 @@ def setup_rtags_daemon(args):
         print(e.output)
         print('echo "Couldn\'t start the RTags daemon."')
         raise
+
 
 def connect_rtags_client(args):
     print('echo "Connecting RTags Client"')
@@ -73,8 +82,7 @@ def connect_rtags_client(args):
             print('echo "Couldn\'t connect the RTags client."')
             raise
     else:
-        print(
-            'echo "Error Generating Compilation Database With CMake"')
+        print('echo "Error Generating Compilation Database With CMake"')
 
 
 @neovim.plugin

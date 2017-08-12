@@ -30,9 +30,9 @@ class TestCMake(utTestCase):
         #subprocess.call(["nvim", "--headless", "-c", "\"terminal python3\""])
         #self.nvimproc = subprocess.Popen(
         #    ["nvim", "--headless", "-c", "\"terminal python3\""])
-            #["NVIM_LISTEN_ADDRESS="+str(self.nvim_remote_socket), "nvim", "--headless", "-c", "\"terminal python3\""])
+        #["NVIM_LISTEN_ADDRESS="+str(self.nvim_remote_socket), "nvim", "--headless", "-c", "\"terminal python3\""])
         #try:
-        #    nvim = neovim.attach("socket", 
+        #    nvim = neovim.attach("socket",
         #                        path=os.environ["NVIM_LISTEN_ADDRESS"])
         #except OSError:
         #    print("Can't Launch Neovim in test fixture setup.")
