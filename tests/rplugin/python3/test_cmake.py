@@ -92,7 +92,9 @@ class TestCMake(utTestCase):
         except OSError:
             print("Test Error: Couldn't cd into 'clean'")
             raise
-        cmake.setup_rtags_daemon([])
+        cmake.setup_rtags_daemon()
+        # Assertions
+        subprocess.call(cmake.cmake_cmd_info["rtags_shutdwn"])
 
 
 if __name__ == '__main__':

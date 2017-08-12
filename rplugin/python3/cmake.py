@@ -53,7 +53,7 @@ def run_cmake(args):
         raise
 
     try:
-        subprocess.check_call([cmake_cmd_info["cmake_cmd"]], cwd="build")
+        subprocess.check_call(cmake_cmd_info["cmake_cmd"], cwd="build")
     except subprocess.CalledProcessError as e:
         print(e.output)
         print('echo "CMake Failed."')
@@ -63,10 +63,10 @@ def run_cmake(args):
         raise
 
 
-def setup_rtags_daemon(args):
+def setup_rtags_daemon():
     print('echo "Initializing RTags Daemon"')
     try:
-        subprocess.check_call([cmake_cmd_info["rdm_cmd"]], cwd="..")
+        subprocess.check_call(cmake_cmd_info["rdm_cmd"], cwd="..")
     except subprocess.CalledProcessError as e:
         print(e.output)
         print('echo "Couldn\'t start the RTags daemon."')
@@ -77,7 +77,7 @@ def connect_rtags_client(args):
     print('echo "Connecting RTags Client"')
     if cmake_build_info["comp_data_cmake"].is_file():
         try:
-            subprocess.check_call([cmake_cmd_info["rc_cmd"]])
+            subprocess.check_call(cmake_cmd_info["rc_cmd"])
         except subprocess.CalledProcessError as e:
             print(e.output)
             print('echo "Couldn\'t connect the RTags client."')
@@ -92,7 +92,7 @@ class Main(object):
         self.vim = vim
 
     @neovim.function('CMakeCompDB', sync=True)
-    def CMakeCompDB(self):
+    def run_cmake_setup_rtags(self, args):
         removeOldCMakeFiles([])
         if cmake_build_info["build_dir"].is_dir():
             removeDirtyDir([])
@@ -100,7 +100,7 @@ class Main(object):
         if cmake_build_info["cmake_proj"].is_file():
             vim.command('echo "Starting CMake Project"')
             run_cmake([])
-            setup_rtags_daemon([])
+            setup_rtags_daemon()
             connect_rtags_client([])
         else:
             self.vim.command('echo "Not a CMake Project"')
