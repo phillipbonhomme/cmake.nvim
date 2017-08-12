@@ -68,7 +68,11 @@ def run_cmake():
 
 def setup_rtags_daemon():
     print("Initializing RTags Daemon")
-    subprocess.check_call(cmake_cmd_info["rtags_shutdwn"])
+    try:
+        subprocess.check_call(cmake_cmd_info["rtags_shutdwn"])
+    except subprocess.CalledProcessError as e:
+        print(e.output)
+        print("Info: RTags Daemon Not Running")
     subprocess.check_call(cmake_cmd_info["rdm_cmd"], cwd="..")
     #try:
     #    subprocess.check_call(cmake_cmd_info["rdm_cmd"], cwd="..")

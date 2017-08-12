@@ -94,7 +94,11 @@ class TestCMake(utTestCase):
             raise
         cmake.setup_rtags_daemon()
         # Assertions
-        subprocess.call(cmake.cmake_cmd_info["rtags_shutdwn"])
+        try:
+            subprocess.check_call(cmake.cmake_cmd_info["rtags_shutdwn"])
+        except subprocess.CalledProcessError as e:
+            print(e.output)
+            print("Info: RTags Daemon Not Running")
 
 
 if __name__ == '__main__':
