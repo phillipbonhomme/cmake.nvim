@@ -71,7 +71,6 @@ class TestCMake(utTestCase):
         self.assertFalse(cmake.cmake_build_info["old_cmake_dir"].is_dir())
 
     def test_initDirty(self):
-        subprocess.call(["ls"])
         try:
             os.chdir("tests/rplugin/python3/dirty")
         except OSError:
@@ -86,6 +85,14 @@ class TestCMake(utTestCase):
             if path != Path("compile_commands.json"):
                 self.assertTrue(path.is_file())
         self.assertTrue(cmake.cmake_build_info["old_cmake_dir"].is_dir())
+
+    def test_RTagsDaemonStart(self):
+        try:
+            os.chdir("tests/rplugin/python3/clean")
+        except OSError:
+            print("Test Error: Couldn't cd into 'clean'")
+            raise
+        cmake.setup_rtags_daemon([])
 
 
 if __name__ == '__main__':
