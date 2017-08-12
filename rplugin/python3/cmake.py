@@ -105,5 +105,6 @@ class CMakeRTagsProject(object):
             run_cmake()
             setup_rtags_daemon()
             connect_rtags_client()
+            self.vim.command('ChromaticaStart')
         else:
             self.vim.command('echo "Not a CMake Project"')
