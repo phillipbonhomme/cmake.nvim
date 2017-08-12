@@ -27,13 +27,13 @@ cmake_cmd_info = {
 }
 
 
-def removeDirtyDir(args):
+def removeDirtyDir():
     if cmake_build_info["build_dir"].is_dir():
         print('echo "Cleaning up Build Directory"')
         subprocess.call(["rm", "-rf", str(cmake_build_info["build_dir"])])
 
 
-def removeOldCMakeFiles(args):
+def removeOldCMakeFiles():
     if cmake_build_info["old_cmake_dir"].is_dir():
         print('echo "Cleaning up Old CMake Directory"')
         subprocess.call(["rm", "-rf", str(cmake_build_info["old_cmake_dir"])])
@@ -43,7 +43,7 @@ def removeOldCMakeFiles(args):
             subprocess.call(["rm", str(path)])
 
 
-def run_cmake(args):
+def run_cmake():
     print('echo "Running CMake"')
     try:
         subprocess.check_call(["mkdir", "build"])
@@ -73,7 +73,7 @@ def setup_rtags_daemon():
         raise
 
 
-def connect_rtags_client(args):
+def connect_rtags_client():
     print('echo "Connecting RTags Client"')
     if cmake_build_info["comp_data_cmake"].is_file():
         try:
@@ -91,8 +91,8 @@ class Main(object):
     def __init__(self, vim):
         self.vim = vim
 
-    @neovim.function('CMakeCompDB', sync=True)
-    def run_cmake_setup_rtags(self, args):
+    @neovim.command('CMakeProjectSetup', sync=True)
+    def run_cmake_setup_rtags(self):
         removeOldCMakeFiles([])
         if cmake_build_info["build_dir"].is_dir():
             removeDirtyDir([])
