@@ -114,7 +114,7 @@ class CMakeRTagsProject(object):
     def __init__(self, vim):
         self.vim = vim
 
-    @neovim.command('CMakeProjectSetup', sync=True)
+    @neovim.command('CMakeProjectSetup', sync=False)
     def run_cmake_setup_rtags(self):
         removeOldCMakeFiles()
         if cmake_build_info["build_dir"].is_dir():
@@ -125,7 +125,7 @@ class CMakeRTagsProject(object):
             run_cmake()
             setup_rtags_daemon()
             connect_rtags_client()
-            for cmd in plugin_cmd_info:
+            for plugin, cmd in plugin_cmd_info:
                 self.vim.command(cmd)
         else:
             self.vim.command('echo "Not a CMake Project"')
