@@ -125,7 +125,7 @@ class CMakeRTagsProject(object):
             run_cmake()
             setup_rtags_daemon()
             connect_rtags_client()
-            for plugin, cmd in plugin_cmd_info:
+            for plugin, cmd in plugin_cmd_info.items():
                 self.vim.command(cmd)
         else:
             self.vim.command('echo "Not a CMake Project"')
