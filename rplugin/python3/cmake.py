@@ -2,26 +2,16 @@ import neovim
 from pathlib import Path
 import subprocess
 
-# 1. Determine if Clean or Dirty
-#    a. Clean - Goto Step #2
-#    b. Dirty - Delete all Old Build Files
-# 2. Run CMake Project Configuration
-#    a. Passes - Goto Step #3
-#    b. Fails - Delete all Old Build Files
-# 3. Setup RTags Daemon
-#    a. Passes - Goto Step #4
-#    b. Fails - Kill Daemon & Repeat Step #3
-# 4. Setup RTags Client
-#    a. Passes - Done!
-#    b. Fails - Kill Daemon & Exit
 cmake_build_info = {
-    "old_cmake_files": [Path("CMakeCache.txt"), Path("cmake_install.cmake")],
+    "old_cmake_files": [
+        Path("CMakeCache.txt"),
+        Path("cmake_install.cmake"),
+        Path("Makefile"),
+        Path("compile_commands.json")],
     "old_cmake_dir": Path("CMakeFiles"),
     "cmake_proj": Path("CMakeLists.txt"),
-    "makefile": Path("Makefile"),
     "build_dir": Path("build"),
-    "comp_data_cmake": Path("build/compile_commands.json"),
-    "comp_data_bear": Path("compile_commands.json")}
+    "comp_data_cmake": Path("build/compile_commands.json")}
 
 cmake_cmd_info = {
     "cmake_cmd": ["cmake", "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON", ".."],
@@ -35,16 +25,16 @@ class Main(object):
         self.vim = vim
 
     def removeDirtyDir(self):
-        if cmake_build_info["old_cmake_dir"].is_dir():
-            self.vim.command('echo "Cleaning up Old CMake Directory"')
-            subprocess.call(
-                ["rm", "-rf", str(cmake_build_info["old_cmake_dir"])])
         if cmake_build_info["build_dir"].is_dir():
             self.vim.command('echo "Cleaning up Build Directory"')
             subprocess.call(
                 ["rm", "-rf", str(cmake_build_info["build_dir"])])
 
     def removeOldCMakeFiles(self):
+        if cmake_build_info["old_cmake_dir"].is_dir():
+            self.vim.command('echo "Cleaning up Old CMake Directory"')
+            subprocess.call(
+                ["rm", "-rf", str(cmake_build_info["old_cmake_dir"])])
         for path in cmake_build_info["old_cmake_files"]:
             if path.is_file():
                 self.vim.command('echo "Cleaning up Old CMake Files"')
@@ -94,7 +84,7 @@ class Main(object):
 
     @neovim.function('CMakeCompDB', sync=True)
     def CMakeCompDB(self):
-
+        self.removeOldCMakeFiles()
         if cmake_build_info["build_dir"].is_dir():
             self.removeDirtyDir()
 
