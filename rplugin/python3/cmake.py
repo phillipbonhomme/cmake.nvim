@@ -30,29 +30,34 @@ cmake_cmd_info = {
 def removeDirtyDir():
     if cmake_build_info["build_dir"].is_dir():
         print("Cleaning up Build Directory")
-        subprocess.call(["rm", "-rf", str(cmake_build_info["build_dir"])])
+        subprocess.call(["rm", "-rf", str(cmake_build_info["build_dir"])],
+                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
 def removeOldCMakeFiles():
     if cmake_build_info["old_cmake_dir"].is_dir():
         print("Cleaning up Old CMake Directory")
-        subprocess.call(["rm", "-rf", str(cmake_build_info["old_cmake_dir"])])
+        subprocess.call(["rm", "-rf", str(cmake_build_info["old_cmake_dir"])],
+                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     for path in cmake_build_info["old_cmake_files"]:
         if path.is_file():
             print("Cleaning up Old CMake Files")
-            subprocess.call(["rm", str(path)])
+            subprocess.call(["rm", str(path)],
+                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
 def run_cmake():
     print("Running CMake")
     try:
-        subprocess.check_call(["mkdir", "build"])
+        subprocess.check_call(["mkdir", "build"],
+                                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     except subprocess.CalledProcessError as e:
         print(e.output)
         print("Can\'t setup CMake build directory.")
         raise
 
-    subprocess.check_call(cmake_cmd_info["cmake_cmd"], cwd="build")
+    subprocess.check_call(cmake_cmd_info["cmake_cmd"], cwd="build",
+                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     if not cmake_build_info["comp_data_cmake"].is_file():
         print("Couldn't setup CMake Project")
     #try:
@@ -69,11 +74,13 @@ def run_cmake():
 def setup_rtags_daemon():
     print("Initializing RTags Daemon")
     try:
-        subprocess.check_call(cmake_cmd_info["rtags_shutdwn"])
+        subprocess.check_call(cmake_cmd_info["rtags_shutdwn"],
+                                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     except subprocess.CalledProcessError as e:
         print(e.output)
         print("Info: RTags Daemon Not Running")
-    subprocess.check_call(cmake_cmd_info["rdm_cmd"], cwd="..")
+    subprocess.check_call(cmake_cmd_info["rdm_cmd"], cwd="..",
+                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     #try:
     #    subprocess.check_call(cmake_cmd_info["rdm_cmd"], cwd="..")
     #except subprocess.CalledProcessError as e:
@@ -85,7 +92,8 @@ def setup_rtags_daemon():
 def connect_rtags_client():
     print("Connecting RTags Client")
     if cmake_build_info["comp_data_cmake"].is_file():
-        subprocess.check_call(cmake_cmd_info["rc_cmd"])
+        subprocess.check_call(cmake_cmd_info["rc_cmd"],
+                                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         #try:
         #    subprocess.check_call(cmake_cmd_info["rc_cmd"])
         #except subprocess.CalledProcessError as e:
