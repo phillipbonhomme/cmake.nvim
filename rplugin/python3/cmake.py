@@ -68,23 +68,26 @@ def run_cmake():
 
 def setup_rtags_daemon():
     print("Initializing RTags Daemon")
-    try:
-        subprocess.check_call(cmake_cmd_info["rdm_cmd"], cwd="..")
-    except subprocess.CalledProcessError as e:
-        print(e.output)
-        print("Couldn\'t start the RTags daemon.")
-        raise
+    subprocess.check_call(cmake_cmd_info["rtags_shutdwn"])
+    subprocess.check_call(cmake_cmd_info["rdm_cmd"], cwd="..")
+    #try:
+    #    subprocess.check_call(cmake_cmd_info["rdm_cmd"], cwd="..")
+    #except subprocess.CalledProcessError as e:
+    #    print(e.output)
+    #    print("Couldn\'t start the RTags daemon.")
+    #    raise
 
 
 def connect_rtags_client():
     print("Connecting RTags Client")
     if cmake_build_info["comp_data_cmake"].is_file():
-        try:
-            subprocess.check_call(cmake_cmd_info["rc_cmd"])
-        except subprocess.CalledProcessError as e:
-            print(e.output)
-            print("Couldn\'t connect the RTags client.")
-            raise
+        subprocess.check_call(cmake_cmd_info["rc_cmd"])
+        #try:
+        #    subprocess.check_call(cmake_cmd_info["rc_cmd"])
+        #except subprocess.CalledProcessError as e:
+        #    print(e.output)
+        #    print("Couldn\'t connect the RTags client.")
+        #    raise
     else:
         print("Error Generating Compilation Database With CMake")
 
