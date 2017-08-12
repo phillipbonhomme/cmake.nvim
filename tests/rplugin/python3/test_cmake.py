@@ -2,6 +2,7 @@ from rplugin.python3 import cmake
 from unittest import TestCase as utTestCase
 from unittest.mock import Mock as utMock
 from unittest import main as utmain
+from pathlib import Path
 import neovim
 import subprocess
 import os
@@ -18,23 +19,40 @@ import os
 # 4. Setup RTags Client
 #    a. Passes - Done!
 #    b. Fails - Kill Daemon & Exit
+NVIM_LISTEN_ADDRESS = "/tmp/nvim-CMakePluginTest"
+nvim_remote_socket = Path(NVIM_LISTEN_ADDRESS)
 
 
 class TestCMake(utTestCase):
     def setUp(self):
+        #self.nvim_remote_socket = Path("/tmp/nvimsocket")
+        #os.environ["NVIM_LISTEN_ADDRESS"] = "/tmp/nvimsocket"
+        #subprocess.call(["nvim", "--headless", "-c", "\"terminal python3\""])
+        #self.nvimproc = subprocess.Popen(
+        #    ["nvim", "--headless", "-c", "\"terminal python3\""])
+            #["NVIM_LISTEN_ADDRESS="+str(self.nvim_remote_socket), "nvim", "--headless", "-c", "\"terminal python3\""])
+        #try:
+        #    nvim = neovim.attach("socket", 
+        #                        path=os.environ["NVIM_LISTEN_ADDRESS"])
+        #except OSError:
+        #    print("Can't Launch Neovim in test fixture setup.")
+        #    raise
         print("Setup for CMake unit test")
-        subprocess.call(["touch", "/tmp/nvimsocket"])
-        os.environ["NVIM_LISTEN_ADDRESS"] = "/tmp/nvimsocket"
-        #subprocess.call(["nvim", "--embed", "-c", "\"terminal python3\""])
+        if nvim_remote_socket.is_file():
+            subprocess.call(["rm", str(nvim_remote_socket)])
+        subprocess.call(["touch", str(nvim_remote_socket)])
+        os.environ["NVIM_LISTEN_ADDRESS"] = str(nvim_remote_socket)
         self.nvimproc = subprocess.Popen(
             ["nvim", "--headless", "-c", "\"terminal python3\""])
-        nvim = neovim.attach('socket', path=os.environ['NVIM_LISTEN_ADDRESS'])
+        nvim = neovim.attach('socket', path=NVIM_LISTEN_ADDRESS)
         self.cmake_plugin = cmake.Main(nvim)
 
     def tearDown(self):
         print("Teardown for CMake unit test")
         self.nvimproc.terminate()
         del os.environ["NVIM_LISTEN_ADDRESS"]
+        if nvim_remote_socket.is_file():
+            subprocess.call(["rm", str(nvim_remote_socket)])
 
     def test_InitClean(self):
         #build_area = utMock()
@@ -46,6 +64,11 @@ class TestCMake(utTestCase):
         for path in cmake.cmake_build_info["old_cmake_files"]:
             self.assertFalse(path.is_file())
         self.assertFalse(cmake.cmake_build_info["old_cmake_dir"].is_file())
+        try:
+            os.chdir("tests/rplugin/python3")
+        except OSError:
+            print("Test Error: Couldn't cd out of 'clean'")
+            raise
 
 
 if __name__ == '__main__':
