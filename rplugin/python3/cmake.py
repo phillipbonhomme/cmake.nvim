@@ -26,6 +26,11 @@ cmake_cmd_info = {
     "rc_cmd": ["rc", "-J", str(cmake_build_info["build_dir"])]
 }
 
+plugin_cmd_info = {
+    "chromatica": "ChromaticaStart",
+    "deoplete": "call deoplete#enable()"
+}
+
 
 def removeDirtyDir():
     if cmake_build_info["build_dir"].is_dir():
@@ -120,6 +125,7 @@ class CMakeRTagsProject(object):
             run_cmake()
             setup_rtags_daemon()
             connect_rtags_client()
-            self.vim.command('ChromaticaStart')
+            for cmd in plugin_cmd_info:
+                self.vim.command(cmd)
         else:
             self.vim.command('echo "Not a CMake Project"')
