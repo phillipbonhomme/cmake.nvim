@@ -87,7 +87,7 @@ def connect_rtags_client():
 
 
 @neovim.plugin
-class Main(object):
+class CMakeRTagsProject(object):
     def __init__(self, vim):
         self.vim = vim
 
@@ -98,7 +98,7 @@ class Main(object):
             removeDirtyDir()
 
         if cmake_build_info["cmake_proj"].is_file():
-            vim.command('echo "Starting CMake Project"')
+            self.vim.command('echo "Starting CMake Project"')
             run_cmake()
             setup_rtags_daemon()
             connect_rtags_client()
