@@ -93,14 +93,14 @@ class Main(object):
 
     @neovim.command('CMakeProjectSetup', sync=True)
     def run_cmake_setup_rtags(self):
-        removeOldCMakeFiles([])
+        removeOldCMakeFiles()
         if cmake_build_info["build_dir"].is_dir():
-            removeDirtyDir([])
+            removeDirtyDir()
 
         if cmake_build_info["cmake_proj"].is_file():
             vim.command('echo "Starting CMake Project"')
-            run_cmake([])
+            run_cmake()
             setup_rtags_daemon()
-            connect_rtags_client([])
+            connect_rtags_client()
         else:
             self.vim.command('echo "Not a CMake Project"')
