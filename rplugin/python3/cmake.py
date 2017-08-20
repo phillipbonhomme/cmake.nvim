@@ -59,56 +59,62 @@ def removeOldCMakeFiles():
 
 def run_cmake():
     print("Running CMake")
-    try:
-        subprocess.check_call(
-            ["mkdir", "build"],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL)
-    except subprocess.CalledProcessError as e:
-        print(e.output)
-        print("Can\'t setup CMake build directory.")
-        raise
-
-    subprocess.check_call(
-        cmake_cmd_info["cmake_cmd"],
-        cwd="build",
+    build_dir_cmd_out = subprocess.call(
+        ["mkdir", "build"],
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL)
-    if not cmake_build_info["comp_data_cmake"].is_file():
+    if build_dir_cmd_out != 0:
+        print("Can\'t setup CMake build directory.")
+        return
+
+    if cmake_build_info["build_dir"].is_dir():
+        cmake_cmd_out = subprocess.call(
+            cmake_cmd_info["cmake_cmd"],
+            cwd=str(cmake_build_info["build_dir"]),
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL)
+        if not cmake_build_info["comp_data_cmake"].is_file():
+            print("Couldn't setup CMake Project")
+            return
+    else :
         print("Couldn't setup CMake Project")
+        return
 
 
 def setup_rtags_daemon():
     print("Initializing RTags Daemon")
-    try:
-        subprocess.check_call(
-            cmake_cmd_info["rtags_shutdwn"],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL)
-    except subprocess.CalledProcessError as e:
-        print(e.output)
-        print("Info: RTags Daemon Not Running")
-    subprocess.check_call(
-        cmake_cmd_info["rdm_cmd"],
-        cwd="..",
+    subprocess.call(
+        cmake_cmd_info["rtags_shutdwn"],
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL)
+
+    rtags_dmn_cmd_out = subprocess.call(
+        cmake_cmd_info["rdm_cmd"],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL)
+    if rtags_dmn_cmd_out != 0:
+        print("Info: RTags Daemon Not Running")
+        return
 
 
 def connect_rtags_client():
     print("Connecting RTags Client")
     if cmake_build_info["comp_data_cmake"].is_file():
-        subprocess.check_call(
+        rtags_clt_cmd_out = subprocess.call(
             cmake_cmd_info["rc_cmd"],
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL)
+        if rtags_clt_cmd_out != 0:
+            print("Info: RTags Daemon Not Running")
+            return
     else:
         print("Error Generating Compilation Database With CMake")
+        return
 
 
 def shutdown_rtags_daemon():
     print("Shutting down RTags Daemon")
-    subprocess.check_call(
+    subprocess.call(
         cmake_cmd_info["rtags_shutdwn"],
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL)
