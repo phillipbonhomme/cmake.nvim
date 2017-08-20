@@ -1,8 +1,6 @@
 from rplugin.python3 import cmake
-from unittest import TestCase as utTestCase
-from unittest.mock import Mock as utMock
-from unittest import main as utmain
-from pathlib import Path
+import unittest
+import pathlib
 import neovim
 import subprocess
 import os
@@ -20,12 +18,12 @@ import os
 #    a. Passes - Done!
 #    b. Fails - Kill Daemon & Exit
 NVIM_LISTEN_ADDRESS = "/tmp/nvim-CMakePluginTest"
-nvim_remote_socket = Path(NVIM_LISTEN_ADDRESS)
+nvim_remote_socket = pathlib.Path(NVIM_LISTEN_ADDRESS)
 
 
-class TestCMake(utTestCase):
+class TestCMake(unittest.TestCase):
     def setUp(self):
-        #self.nvim_remote_socket = Path("/tmp/nvimsocket")
+        #self.nvim_remote_socket = pathlib.Path("/tmp/nvimsocket")
         #os.environ["NVIM_LISTEN_ADDRESS"] = "/tmp/nvimsocket"
         #subprocess.call(["nvim", "--headless", "-c", "\"terminal python3\""])
         #self.nvimproc = subprocess.Popen(
@@ -60,7 +58,7 @@ class TestCMake(utTestCase):
         #    subprocess.call(["rm", str(nvim_remote_socket)])
 
     def test_InitClean(self):
-        #build_area = utMock()
+        #build_area = unittest.mock.Mock()
         try:
             os.chdir("tests/rplugin/python3/clean")
         except OSError:
@@ -82,7 +80,7 @@ class TestCMake(utTestCase):
             print("Test Error: Couldn't cd into build directory")
             raise
         for path in cmake.cmake_build_info["old_cmake_files"]:
-            if path != Path("compile_commands.json"):
+            if path != pathlib.Path("compile_commands.json"):
                 self.assertTrue(path.is_file())
         self.assertTrue(cmake.cmake_build_info["old_cmake_dir"].is_dir())
 
@@ -102,4 +100,4 @@ class TestCMake(utTestCase):
 
 
 if __name__ == '__main__':
-    utmain()
+    unittest.main()

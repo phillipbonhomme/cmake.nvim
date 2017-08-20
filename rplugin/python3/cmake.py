@@ -76,7 +76,7 @@ def run_cmake():
         if not cmake_build_info["comp_data_cmake"].is_file():
             print("Couldn't setup CMake Project")
             return
-    else :
+    else:
         print("Couldn't setup CMake Project")
         return
 
