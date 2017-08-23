@@ -17,3 +17,15 @@
 function! CMakeTargets()
     echo "Get CMake Targets"
 endfunction
+" RTags Setup
+if !exists("g:rtags_client_command")
+    let g:rtags_client_command = "rc"
+endif
+function! AddFileToRTagsProject()
+    execute "!" . g:rtags_client_command . " --add-buffers " . bufname("%")
+endfunction
+autocmd FileType cpp :call AddFileToRTagsProject()
+autocmd FileType cc :call AddFileToRTagsProject()
+autocmd FileType c :call AddFileToRTagsProject()
+autocmd FileType hpp :call AddFileToRTagsProject()
+autocmd FileType h :call AddFileToRTagsProject()

@@ -69,7 +69,7 @@ def run_cmake():
         return
 
     if cmake_build_info["build_dir"].is_dir():
-        cmake_cmd_out = subprocess.call(
+        subprocess.call(
             cmake_cmd_info["cmake_cmd"],
             cwd=str(cmake_build_info["build_dir"]),
             stdout=subprocess.DEVNULL,
