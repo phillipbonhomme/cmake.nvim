@@ -21,6 +21,13 @@ NVIM_LISTEN_ADDRESS = "/tmp/nvim-CMakePluginTest"
 nvim_remote_socket = pathlib.Path(NVIM_LISTEN_ADDRESS)
 
 
+src_info = {
+        "cpp": pathlib.Path("main.cpp"),
+        "test_cpp": pathlib.Path("Test.cpp"),
+        "cmake": pathlib.Path("CMakeLists.txt")
+}
+
+
 class TestCMake(unittest.TestCase):
     def setUp(self):
         #self.nvim_remote_socket = pathlib.Path("/tmp/nvimsocket")
@@ -35,7 +42,6 @@ class TestCMake(unittest.TestCase):
         #except OSError:
         #    print("Can't Launch Neovim in test fixture setup.")
         #    raise
-        print("Setup for CMake unit test")
         #if nvim_remote_socket.is_file():
         #    subprocess.call(["rm", str(nvim_remote_socket)])
         #subprocess.call(["touch", str(nvim_remote_socket)])
@@ -44,6 +50,12 @@ class TestCMake(unittest.TestCase):
         #    ["nvim", "--headless", "-c", "\"terminal python3\""])
         #nvim = neovim.attach('socket', path=NVIM_LISTEN_ADDRESS)
         #self.cmake_plugin = cmake.Main(nvim)
+        print("Setup for CMake unit test")
+        try:
+            os.chdir("tests/rplugin/python3")
+        except OSError:
+            print("Test Error: Couldn't cd into testing directory.")
+            raise
 
     def tearDown(self):
         print("Teardown for CMake unit test")
@@ -52,51 +64,80 @@ class TestCMake(unittest.TestCase):
         except OSError:
             print("Test Error: Couldn't cd out of test directory")
             raise
+        subprocess.call(cmake.cmake_cmd_info["rtags_shutdwn"])
         #self.nvimproc.terminate()
         #del os.environ["NVIM_LISTEN_ADDRESS"]
         #if nvim_remote_socket.is_file():
         #    subprocess.call(["rm", str(nvim_remote_socket)])
 
     def test_InitClean(self):
-        #build_area = unittest.mock.Mock()
         try:
-            os.chdir("tests/rplugin/python3/clean")
+            os.chdir("clean")
         except OSError:
-            print("Test Error: Couldn't cd into 'clean'")
+            print("Test Error: Couldn't cd into 'clean' test directory.")
             raise
+        self.assertFalse(cmake.cmake_build_info["build_dir"].is_dir())
         for path in cmake.cmake_build_info["old_cmake_files"]:
             self.assertFalse(path.is_file())
         self.assertFalse(cmake.cmake_build_info["old_cmake_dir"].is_dir())
 
     def test_initDirty(self):
         try:
-            os.chdir("tests/rplugin/python3/dirty")
+            os.chdir("dirty")
         except OSError:
-            print("Test Error: Couldn't cd into 'dirty'")
+            print("Test Error: Couldn't cd into 'dirty' test directory.")
             raise
         try:
             os.chdir(str(cmake.cmake_build_info["build_dir"]))
         except OSError:
             print("Test Error: Couldn't cd into build directory")
             raise
+        self.assertTrue(cmake.cmake_build_info["old_cmake_dir"].is_dir())
         for path in cmake.cmake_build_info["old_cmake_files"]:
             if path != pathlib.Path("compile_commands.json"):
                 self.assertTrue(path.is_file())
-        self.assertTrue(cmake.cmake_build_info["old_cmake_dir"].is_dir())
 
-    def test_RTagsDaemonStart(self):
+    def test_RTagsDaemonStartDirty(self):
         try:
-            os.chdir("tests/rplugin/python3/clean")
+            os.chdir("dirty")
         except OSError:
-            print("Test Error: Couldn't cd into 'clean'")
+            print("Test Error: Couldn't cd into 'dirty' test directory.")
             raise
+        self.assertTrue(cmake.cmake_build_info["build_dir"].is_dir())
         cmake.setup_rtags_daemon()
-        # Assertions
         try:
-            subprocess.check_call(cmake.cmake_cmd_info["rtags_shutdwn"])
-        except subprocess.CalledProcessError as e:
-            print(e.output)
-            print("Info: RTags Daemon Not Running")
+            rtags_daemon_status = subprocess.check_output(
+                cmake.cmake_cmd_info["rtags_status"])
+        except subprocess.CalledProcessError:
+        self.assertEqual(rtags_daemon_status.returncode, 0)
+        #self.assertEqual(rtags_daemon_status.output, "")
+
+        #self.assertTrue(cmake.cmake_build_info["comp_data_cmake"].is_file())
+        #file_check_out = subprocess.check_call(
+        #    [cmake.cmake_cmd_info["rtags_check_file"] + " " +
+        #        str(src_info["cpp"])],
+        #    stdout=subprocess.STDOUT,
+        #    stderr=subprocess.STDERR)
+        #self.assertEqual(file_check_out.output, "managed")
+        #file_check_out = subprocess.check_call(
+        #    [cmake.cmake_cmd_info["rtags_check_file"] + " " +
+        #        str(src_info["test_cpp"])],
+        #    stdout=subprocess.STDOUT,
+        #    stderr=subprocess.STDERR)
+        #self.assertEqual(file_check_out.output, "managed")
+
+    #def test_RTagsClientControlBuffers(self):
+    #def test_RTagsClientInit(self):
+    #def test_RTagsDaemonStop(self):
+    #def test_RTagsDaemonRestart(self):
+    #def test_RTagsDaemonStart(self):
+    #    try:
+    #        os.chdir("tests/rplugin/python3/clean")
+    #    except OSError:
+    #        print("Test Error: Couldn't cd into 'clean'")
+    #        raise
+    #    cmake.setup_rtags_daemon()
+    #    # Assertions
 
 
 if __name__ == '__main__':

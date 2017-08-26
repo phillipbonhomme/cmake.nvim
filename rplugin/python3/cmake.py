@@ -21,9 +21,14 @@ cmake_build_info = {
 
 cmake_cmd_info = {
     "cmake_cmd": ["cmake", "-DCMAKE_EXPORT_COMPILE_COMMANDS=1", ".."],
-    "rdm_cmd": ["rdm", "--silent", "--daemon"],
+    "rdm_cmd": ["rdm", "--silent", "--daemon", "--no-startup-project",
+                "--job-count 4", "--watch-sources-only", "--completion-cache-size 15",
+                "--max-include-completion-depth 5"],
     "rtags_cleanup": ["rc", "--clear"],
+    "rtags_status": ["rc", "--status"],
     "rtags_shutdwn": ["rc", "--quit-rdm"],
+    "rtags_buffer": ["rc", "--set-buffer"],
+    "rtags_file": ["rc", "--current-file"],
     "rc_cmd": ["rc", "-J", str(cmake_build_info["build_dir"])]
 }
 
@@ -84,10 +89,10 @@ def run_cmake():
 
 def setup_rtags_daemon():
     print("Initializing RTags Daemon")
-    subprocess.call(
-        cmake_cmd_info["rtags_cleanup"],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL)
+    #subprocess.call(
+    #    cmake_cmd_info["rtags_cleanup"],
+    #    stdout=subprocess.DEVNULL,
+    #    stderr=subprocess.DEVNULL)
 
     subprocess.call(
         cmake_cmd_info["rtags_shutdwn"],
@@ -120,10 +125,10 @@ def connect_rtags_client():
 
 def shutdown_rtags_daemon():
     print("Shutting down RTags Daemon")
-    subprocess.call(
-        cmake_cmd_info["rtags_cleanup"],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL)
+    #subprocess.call(
+    #    cmake_cmd_info["rtags_cleanup"],
+    #    stdout=subprocess.DEVNULL,
+    #    stderr=subprocess.DEVNULL)
 
     subprocess.call(
         cmake_cmd_info["rtags_shutdwn"],
