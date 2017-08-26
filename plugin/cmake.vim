@@ -21,11 +21,21 @@ endfunction
 if !exists("g:rtags_client_command")
     let g:rtags_client_command = "rc"
 endif
-function! AddFileToRTagsProject()
-    execute "!" . g:rtags_client_command . " --add-buffers " . bufname("%")
-endfunction
-autocmd FileType cpp :call AddFileToRTagsProject()
-autocmd FileType cc :call AddFileToRTagsProject()
-autocmd FileType c :call AddFileToRTagsProject()
-autocmd FileType hpp :call AddFileToRTagsProject()
-autocmd FileType h :call AddFileToRTagsProject()
+"function! UpdateRTagsBuffers()
+"    execute "!" . g:rtags_client_command . " --add-buffers" . bufname("%")
+"endfunction
+autocmd FileType cpp :CMakeProjectSetFile expand('%:p')<CR>
+autocmd FileType cc :CMakeProjectSetFile expand('%:p')<CR>
+autocmd FileType c :CMakeProjectSetFile expand('%:p')<CR>
+autocmd FileType hpp :CMakeProjectSetFile expand('%:p')<CR>
+autocmd FileType h :CMakeProjectSetFile expand('%:p')<CR>
+"autocmd FileType cpp :CMakeProjectUpdateBuffers<CR>
+"autocmd FileType cc :CMakeProjectUpdateBuffers<CR>
+"autocmd FileType c :CMakeProjectUpdateBuffers<CR>
+"autocmd FileType hpp :CMakeProjectUpdateBuffers<CR>
+"autocmd FileType h :CMakeProjectUpdateBuffers<CR>
+"autocmd FileType cpp :call UpdateRTagsBuffers()
+"autocmd FileType cc :call UpdateRTagsBuffers()
+"autocmd FileType c :call UpdateRTagsBuffers()
+"autocmd FileType hpp :call UpdateRTagsBuffers()
+"autocmd FileType h :call UpdateRTagsBuffers()

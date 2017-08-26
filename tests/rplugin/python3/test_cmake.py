@@ -155,32 +155,45 @@ class TestCMake(unittest.TestCase):
             print(e.output)
         self.assertTrue(str(rtags_client_status).find("managed"))
 
-        #self.assertTrue(cmake.cmake_build_info["comp_data_cmake"].is_file())
-        #file_check_out = subprocess.check_call(
-        #    [cmake.cmake_cmd_info["rtags_check_file"] + " " +
-        #        str(src_info["cpp"])],
-        #    stdout=subprocess.STDOUT,
-        #    stderr=subprocess.STDERR)
-        #self.assertEqual(file_check_out.output, "managed")
-        #file_check_out = subprocess.check_call(
-        #    [cmake.cmake_cmd_info["rtags_check_file"] + " " +
-        #        str(src_info["test_cpp"])],
-        #    stdout=subprocess.STDOUT,
-        #    stderr=subprocess.STDERR)
-        #self.assertEqual(file_check_out.output, "managed")
+    def test_RTagsClientSetFile(self):
+        try:
+            os.chdir("dirty")
+        except OSError:
+            print("Test Error: Couldn't cd into 'dirty' test directory.")
+            raise
+        self.assertTrue(cmake.cmake_build_info["build_dir"].is_dir())
+        self.assertTrue(cmake.cmake_build_info["comp_data_cmake"].is_file())
+        cmake.setup_rtags_daemon()
+        cmake.connect_rtags_client()
+        cmake.rtags_set_file([str(src_info["cpp"])])
+        try:
+            rtags_client_status = subprocess.check_output(
+                cmake.cmake_cmd_info["rtags_file_status"] +
+                [str(src_info["cpp"])])
+        except subprocess.CalledProcessError as e:
+            print(e.output)
+        self.assertTrue(str(rtags_client_status).find("managed"))
 
-    #def test_RTagsClientControlBuffers(self):
-    #def test_RTagsClientInit(self):
-    #def test_RTagsDaemonStop(self):
-    #def test_RTagsDaemonRestart(self):
-    #def test_RTagsDaemonStart(self):
-    #    try:
-    #        os.chdir("tests/rplugin/python3/clean")
-    #    except OSError:
-    #        print("Test Error: Couldn't cd into 'clean'")
-    #        raise
-    #    cmake.setup_rtags_daemon()
-    #    # Assertions
+    def test_RTagsClientUpdateBuffers(self):
+        try:
+            os.chdir("dirty")
+        except OSError:
+            print("Test Error: Couldn't cd into 'dirty' test directory.")
+            raise
+        self.assertTrue(cmake.cmake_build_info["build_dir"].is_dir())
+        self.assertTrue(cmake.cmake_build_info["comp_data_cmake"].is_file())
+        cmake.setup_rtags_daemon()
+        cmake.connect_rtags_client()
+        cmake.update_rtags_buffers(
+            [str(src_info["test_cpp"]),
+             str(src_info["cpp"])])
+        try:
+            rtags_client_status = subprocess.check_output(
+                cmake.cmake_cmd_info["rtags_buffers"])
+        except subprocess.CalledProcessError as e:
+            print(e.output)
+        filepath = os.getcwd() + str(src_info["test_cpp"])
+        self.assertTrue(str(rtags_client_status).find(filepath))
 
 
 if __name__ == '__main__':

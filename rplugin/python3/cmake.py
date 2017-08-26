@@ -32,6 +32,7 @@ cmake_cmd_info = {
     "rtags_file_status": ["rc", "--is-indexed"],
     "rtags_shutdwn": ["rc", "--quit-rdm"],
     "rtags_buffer": ["rc", "--set-buffer"],
+    "rtags_buffers": ["rc", "--list-buffers"],
     "rtags_file": ["rc", "--current-file"],
     "rc_cmd": ["rc", "-J", str(cmake_build_info["build_dir"])]
 }
@@ -136,6 +137,32 @@ def shutdown_rtags_daemon():
         print(e.output)
 
 
+def rtags_set_file(arg):
+    current_buffer = arg
+    try:
+        subprocess.call(
+            cmake_cmd_info["rtags_file"] + current_buffer,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL)
+    except subprocess.CalledProcessError as e:
+        print(e.output)
+
+
+def update_rtags_buffers(args):
+    buffers = args
+    cpp_buffers = []
+    for buffer in buffers:
+        if str(buffer)[-4:] in ['.cpp', '.cc', '.c', '.h', '.hpp']:
+            cpp_buffers.append(buffer)
+    try:
+        subprocess.call(
+            cmake_cmd_info["rtags_buffer"] + cpp_buffers,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL)
+    except subprocess.CalledProcessError as e:
+        print(e.output)
+
+
 @neovim.plugin
 class CMakeRTagsProject(object):
     def __init__(self, vim):
@@ -160,3 +187,13 @@ class CMakeRTagsProject(object):
     @neovim.command('CMakeProjectTeardown', sync=False)
     def run_cmake_teardown_rtags(self):
         shutdown_rtags_daemon()
+
+    @neovim.command('CMakeProjectSetFile', nargs='1', sync=True)
+    def run_rtags_set_file(self, arg):
+        rtags_set_file(arg)
+
+    @neovim.command('CMakeProjectUpdateBuffers', sync=False)
+    def run_update_rtags_buffers(self):
+        buffers = self.vim.buffers
+        update_rtags_buffers(buffers)
+
