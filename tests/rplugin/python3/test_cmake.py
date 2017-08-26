@@ -96,6 +96,23 @@ class TestCMake(unittest.TestCase):
             if path != pathlib.Path("compile_commands.json"):
                 self.assertTrue(path.is_file())
 
+    def test_RTagsDaemonStartClean(self):
+        try:
+            os.chdir("clean")
+        except OSError:
+            print("Test Error: Couldn't cd into 'dirty' test directory.")
+            raise
+        self.assertFalse(cmake.cmake_build_info["build_dir"].is_dir())
+        cmake.setup_rtags_daemon()
+        try:
+            rtags_daemon_status = subprocess.check_output(
+                cmake.cmake_cmd_info["rtags_status"])
+        except subprocess.CalledProcessError as e:
+            print(e.output)
+        self.assertTrue(
+            len("*********************************\nfileids\n*********************************\n*********************************\nheadererrors\n*********************************\n*********************************\ninfo\n*********************************\nRunning a release build\nsocketFile: /Users/phillipbonhomme/.rdm\ndataDir: /Users/phillipbonhomme/.cache/rtags/\noptions: 0x14jobCount: 4\nrpVisitFileTimeout: 60000\nrpIndexDataMessageTimeout: 60000\nrpConnectTimeout: 0\nrpConnectTimeout: 0\ndefaultArguments: List<String>(-ferror-limit=50, -Wall, -fspell-checking, -Wno-unknown-warning-option\")\nincludePaths: List<Source::Include>(\")\ndefines: List<Source::Define>(-DRTAGS=\")\nignoredCompilers: Set<Path>(\")\n*********************************\njobs\n*********************************\n"
+                ) <= len(str(rtags_daemon_status)))
+
     def test_RTagsDaemonStartDirty(self):
         try:
             os.chdir("dirty")
@@ -109,21 +126,34 @@ class TestCMake(unittest.TestCase):
                 cmake.cmake_cmd_info["rtags_status"])
         except subprocess.CalledProcessError as e:
             print(e.output)
-        #try:
-        #    rtags_daemon_status = subprocess.check_call(
-        #        cmake.cmake_cmd_info["rtags_status"])
-        #except subprocess.CalledProcessError as e:
-        #    if rtags_daemon_status.returncode != 0:
-        #        print(e.output)
-        #        print("Test Error: RTags Daemon is not running yet.")
-        #        raise
-
-        #self.assertIn(
-        #    "*********************************\nfileids\n*********************************\n*********************************\nheadererrors\n*********************************\n*********************************\ninfo\n*********************************\nRunning a release build\nsocketFile: /Users/phillipbonhomme/.rdm\ndataDir: /Users/phillipbonhomme/.cache/rtags/\noptions: 0x14jobCount: 4\nrpVisitFileTimeout: 60000\nrpIndexDataMessageTimeout: 60000\nrpConnectTimeout: 0\nrpConnectTimeout: 0\ndefaultArguments: List<String>(-ferror-limit=50, -Wall, -fspell-checking, -Wno-unknown-warning-option\")\nincludePaths: List<Source::Include>(\")\ndefines: List<Source::Define>(-DRTAGS=\")\nignoredCompilers: Set<Path>(\")\n*********************************\njobs\n*********************************\n",
-        #    str(rtags_daemon_status))
-        self.assertEqual(
+        self.assertTrue(
             len("*********************************\nfileids\n*********************************\n*********************************\nheadererrors\n*********************************\n*********************************\ninfo\n*********************************\nRunning a release build\nsocketFile: /Users/phillipbonhomme/.rdm\ndataDir: /Users/phillipbonhomme/.cache/rtags/\noptions: 0x14jobCount: 4\nrpVisitFileTimeout: 60000\nrpIndexDataMessageTimeout: 60000\nrpConnectTimeout: 0\nrpConnectTimeout: 0\ndefaultArguments: List<String>(-ferror-limit=50, -Wall, -fspell-checking, -Wno-unknown-warning-option\")\nincludePaths: List<Source::Include>(\")\ndefines: List<Source::Define>(-DRTAGS=\")\nignoredCompilers: Set<Path>(\")\n*********************************\njobs\n*********************************\n"
-                ), len(str(rtags_daemon_status)) - 23)
+                ) <= len(str(rtags_daemon_status)))
+
+    def test_RTagsClientStartDirty(self):
+        try:
+            os.chdir("dirty")
+        except OSError:
+            print("Test Error: Couldn't cd into 'dirty' test directory.")
+            raise
+        self.assertTrue(cmake.cmake_build_info["build_dir"].is_dir())
+        self.assertTrue(cmake.cmake_build_info["comp_data_cmake"].is_file())
+        cmake.setup_rtags_daemon()
+        cmake.connect_rtags_client()
+        try:
+            rtags_client_status = subprocess.check_output(
+                cmake.cmake_cmd_info["rtags_file_status"] +
+                [str(src_info["cpp"])])
+        except subprocess.CalledProcessError as e:
+            print(e.output)
+        self.assertTrue(str(rtags_client_status).find("managed"))
+        try:
+            rtags_client_status = subprocess.check_output(
+                cmake.cmake_cmd_info["rtags_file_status"] +
+                [str(src_info["test_cpp"])])
+        except subprocess.CalledProcessError as e:
+            print(e.output)
+        self.assertTrue(str(rtags_client_status).find("managed"))
 
         #self.assertTrue(cmake.cmake_build_info["comp_data_cmake"].is_file())
         #file_check_out = subprocess.check_call(

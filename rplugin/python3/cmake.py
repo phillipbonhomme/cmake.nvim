@@ -21,13 +21,15 @@ cmake_build_info = {
 
 cmake_cmd_info = {
     "cmake_cmd": ["cmake", "-DCMAKE_EXPORT_COMPILE_COMMANDS=1", ".."],
-    "rdm_cmd": ["rdm", "--silent", "--daemon", "--no-startup-project"],
+    "rdm_cmd":
+    ["rdm", "--silent", "--daemon", "--no-startup-project", "--job-count=4"],
     "rdm_cmd_config": [
-        "rdm", "--job-count 4", "--watch-sources-only",
-        "--completion-cache-size 15", "--max-include-completion-depth 5"
+        "rdm", "--watch-sources-only", "--completion-cache-size=15",
+        "--max-include-completion-depth=5"
     ],
     "rtags_cleanup": ["rc", "--clear"],
     "rtags_status": ["rc", "--status"],
+    "rtags_file_status": ["rc", "--is-indexed"],
     "rtags_shutdwn": ["rc", "--quit-rdm"],
     "rtags_buffer": ["rc", "--set-buffer"],
     "rtags_file": ["rc", "--current-file"],
@@ -77,7 +79,7 @@ def run_cmake():
 
     if cmake_build_info["build_dir"].is_dir():
         try:
-            cmake_cmd_out = subprocess.check_output(
+            subprocess.check_output(
                 cmake_cmd_info["cmake_cmd"],
                 cwd=str(cmake_build_info["build_dir"]),
                 stdout=subprocess.DEVNULL,
@@ -94,11 +96,6 @@ def run_cmake():
 
 def setup_rtags_daemon():
     print("Initializing RTags Daemon")
-    #subprocess.call(
-    #    cmake_cmd_info["rtags_cleanup"],
-    #    stdout=subprocess.DEVNULL,
-    #    stderr=subprocess.DEVNULL)
-
     try:
         subprocess.check_output(
             cmake_cmd_info["rtags_shutdwn"], stderr=subprocess.DEVNULL)
@@ -106,14 +103,11 @@ def setup_rtags_daemon():
         print(e.output)
 
     try:
-        rtags_dmn_cmd_out = subprocess.check_call(
+        subprocess.check_call(
             cmake_cmd_info["rdm_cmd"], stderr=subprocess.DEVNULL)
     except subprocess.CalledProcessError as e:
         print(e.output)
         raise
-    #if rtags_dmn_cmd_out != 0:
-    #    print("Info: RTags Daemon Not Running")
-    #    return
 
 
 def connect_rtags_client():

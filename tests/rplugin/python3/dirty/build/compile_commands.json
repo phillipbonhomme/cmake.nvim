@@ -1,0 +1,12 @@
+[
+{
+  "directory": "/Users/phillipbonhomme/projects/github/cmake.nvim/tests/rplugin/python3/dirty/build",
+  "command": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   -I/include -I/gtest/include   -Wall   -std=c++0x -o CMakeFiles/test.dir/Test.cpp.o -c /Users/phillipbonhomme/projects/github/cmake.nvim/tests/rplugin/python3/dirty/Test.cpp",
+  "file": "/Users/phillipbonhomme/projects/github/cmake.nvim/tests/rplugin/python3/dirty/Test.cpp"
+},
+{
+  "directory": "/Users/phillipbonhomme/projects/github/cmake.nvim/tests/rplugin/python3/dirty/build",
+  "command": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   -I/include -I/gtest/include   -Wall   -std=c++0x -o CMakeFiles/test.dir/main.cpp.o -c /Users/phillipbonhomme/projects/github/cmake.nvim/tests/rplugin/python3/dirty/main.cpp",
+  "file": "/Users/phillipbonhomme/projects/github/cmake.nvim/tests/rplugin/python3/dirty/main.cpp"
+}
+]
