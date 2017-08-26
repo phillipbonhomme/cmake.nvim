@@ -82,9 +82,7 @@ def run_cmake():
         try:
             subprocess.check_output(
                 cmake_cmd_info["cmake_cmd"],
-                cwd=str(cmake_build_info["build_dir"]),
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL)
+                cwd=str(cmake_build_info["build_dir"]))
         except subprocess.CalledProcessError as e:
             print(e.output)
         if not cmake_build_info["comp_data_cmake"].is_file():
@@ -196,4 +194,3 @@ class CMakeRTagsProject(object):
     def run_update_rtags_buffers(self):
         buffers = self.vim.buffers
         update_rtags_buffers(buffers)
-
