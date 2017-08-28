@@ -12,7 +12,7 @@
   noremap <unique> <Plug>RTagsGoTo :RTagsGoTo <CR>
   noremap <unique> <Plug>RTagsFindRefs :RTagsFindRefs <CR>
   noremap <unique> <Plug>RTagsFindSymbol :RTagsFindSymbol <CR>
-  source 'plugin/rtags.vim'
+  source 'rtags.vim'
 " Misc.
   function! CMakeTargets()
       echo "Get CMake Targets"
