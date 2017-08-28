@@ -195,6 +195,25 @@ class TestCMake(unittest.TestCase):
         filepath = os.getcwd() + str(src_info["test_cpp"])
         self.assertTrue(str(rtags_client_status).find(filepath))
 
+    def test_RTagsDaemonSink(self):
+        try:
+            os.chdir("dirty")
+        except OSError:
+            print("Test Error: Couldn't cd into 'dirty' test directory.")
+            raise
+        self.assertTrue(cmake.cmake_build_info["build_dir"].is_dir())
+        self.assertTrue(cmake.cmake_build_info["comp_data_cmake"].is_file())
+        cmake.setup_rtags_daemon()
+        cmake.connect_rtags_client()
+        cmake.update_rtags_buffers(
+            [str(src_info["test_cpp"]),
+             str(src_info["cpp"])])
+        try:
+            rtags_client_status = subprocess.check_output(
+                cmake.cmake_cmd_info["rtags_buffers"])
+        except subprocess.CalledProcessError as e:
+            print(e.output)
+
 
 if __name__ == '__main__':
     unittest.main()
