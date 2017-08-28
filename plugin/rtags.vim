@@ -23,7 +23,7 @@ endfunction
 
 function! s:rtags_gotodefdecl_source()
   let lines = map(split(system(
-    \ 'rc --follow-location ' . s:getCurrentLocation()),
+    \ 'rc --absolute-path --follow-location ' . s:getCurrentLocation()),
     \ "\n"), 'split(v:val, "\t")')
   if v:shell_error
     throw 'error from rtags client'
@@ -32,7 +32,7 @@ function! s:rtags_gotodefdecl_source()
 endfunction
 function! s:rtags_findreferences_source()
   let lines = map(split(system(
-    \ 'rc --wildcard-symbol-names --all-references --references-name ' . expand("<cword>")),
+    \ 'rc --absolute-path --wildcard-symbol-names --all-references --references-name ' . expand("<cword>")),
     \ "\n"), 'split(v:val, "\t")')
   if v:shell_error
     throw 'error from rtags client'
@@ -41,7 +41,7 @@ function! s:rtags_findreferences_source()
 endfunction
 function! s:rtags_findsymbols_source()
   let lines = map(split(system(
-    \ 'rc --wildcard-symbol-names --find-symbols "*"'),
+    \ 'rc --absolute-path --wildcard-symbol-names --find-symbols "*"'),
     \ "\n"), 'split(v:val, "\t")')
   if v:shell_error
     throw 'error from rtags client'
