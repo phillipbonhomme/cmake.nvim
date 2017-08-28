@@ -1,6 +1,10 @@
 " ----------------------------------------------------------------------------
 " RTags
 " ----------------------------------------------------------------------------
+" From vim help for getcurpos
+" let save_cursor = getcurpos()
+" MoveTheCursorAround
+" call setpos('.', save_cursor)
 function! s:getCurrentLocation()
     let [lnum, col] = getpos('.')[1:2]
     return expand('%:p') . ":" . lnum . ":" . col
