@@ -9,10 +9,9 @@
   autocmd FileType hpp :CMakeProjectSetFile expand('%:p')<CR>
   autocmd FileType h :CMakeProjectSetFile expand('%:p')<CR>
 " Mappings
-  noremap <unique> <Plug>RTagsGoTo :RTagsGoTo <CR>
-  noremap <unique> <Plug>RTagsFindRefs :RTagsFindRefs <CR>
-  noremap <unique> <Plug>RTagsFindSymbol :RTagsFindSymbol <CR>
-  source 'rtags.vim'
+  "noremap <unique> <Plug>RTagsGoTo :RTagsGoTo <CR>
+  "noremap <unique> <Plug>RTagsFindRefs :RTagsFindRefs <CR>
+  "noremap <unique> <Plug>RTagsFindSymbol :RTagsFindSymbol <CR>
 " Misc.
   function! CMakeTargets()
       echo "Get CMake Targets"
