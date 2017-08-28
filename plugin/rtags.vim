@@ -3,7 +3,8 @@
 " ----------------------------------------------------------------------------
 function! s:getCurrentLocation()
     let [lnum, col] = getpos('.')[1:2]
-    return printf("%s:%s:%s", expand("%"), lnum, col)
+    return expand('%:p') . ":" . lnum . ":" . col
+    "return printf("%s:%s:%s", expand('%:p'), lnum, col)
 endfunction
 
 function! s:align_lists(lists)
@@ -22,46 +23,52 @@ function! s:align_lists(lists)
 endfunction
 
 function! s:rtags_gotodefdecl_source()
-  let lines = map(split(system(
+  let lines = map(map(split(system(
     \ 'rc --absolute-path --follow-location ' . s:getCurrentLocation()),
-    \ "\n"), 'split(v:val, "\t")')
+    \ "\n"), 'split(v:val, "\t")'), 'reverse(v:val)')
   if v:shell_error
     throw 'error from rtags client'
   endif
   return map(s:align_lists(lines), 'join(v:val, "\t")')
 endfunction
 function! s:rtags_findreferences_source()
-  let lines = map(split(system(
+  let lines = map(map(split(system(
     \ 'rc --absolute-path --wildcard-symbol-names --all-references --references-name ' . expand("<cword>")),
-    \ "\n"), 'split(v:val, "\t")')
+    \ "\n"), 'split(v:val, "\t")'), 'reverse(v:val)')
   if v:shell_error
     throw 'error from rtags client'
   endif
   return map(s:align_lists(lines), 'join(v:val, "\t")')
 endfunction
 function! s:rtags_findsymbols_source()
-  let lines = map(split(system(
-    \ 'rc --absolute-path --wildcard-symbol-names --find-symbols "*"'),
-    \ "\n"), 'split(v:val, "\t")')
+  let lines = map(map(split(system(
+    \ 'rc --absolute-path --wildcard-symbol-names --cursor-kind --find-symbols "*"'),
+    \ "\n"), 'split(v:val, "\t")'), 'reverse(v:val)')
   if v:shell_error
     throw 'error from rtags client'
   endif
   return map(s:align_lists(lines), 'join(v:val, "\t")')
 endfunction
 
+"function! s:tags_sink(line)
+"  let parts = split(a:line, '\t\zs')
+"  let excmd = matchstr(parts[2:], '^.*\ze;"\t')
+"  execute 'silent e' parts[1][:-2]
+"  let [magic, &magic] = [&magic, 0]
+"  execute excmd
+"  let &magic = magic
+"endfunction
 function! s:rtags_sink(line)
   "execute split(a:line, "\t")[2]
   "execute "normal " . split(a:line, "\t")[0][:-1]
-  call setpos("''", getpos("."))
-  let fileLine=split(a:line, "\t")[0]
+  "call setpos("''", getpos("."))
+  let fileLine=split(a:line, "\t")[-1]
   let filename=split(fileLine,":")[0]
   let linenumber=split(fileLine,":")[1]
   let columnnumber=split(fileLine,":")[2]
-  echo fileLine
-  echo filename
-  echo linenumber
-  echo columnnumber
-  execute "edit +" . linenumber . ":" . columnnumber. " " . filename
+  execute "edit " . filename
+  execute "normal " . linenumber . "G" . columnnumber . "|"
+  "execute "edit +" . linenumber . " " . filename
 endfunction
 
 function! s:rtags_gotodefdecl()
