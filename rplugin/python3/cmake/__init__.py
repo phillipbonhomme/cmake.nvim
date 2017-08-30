@@ -2,6 +2,7 @@ import neovim
 import json
 from pathlib import Path
 import subprocess
+import cmake
 
 @neovim.plugin
 class CMakeRTagsProject(object):
@@ -15,6 +16,7 @@ class CMakeRTagsProject(object):
             "chromatica": "ChromaticaStart",
             "deoplete": "call deoplete#enable()"
         }
+        self.util = CMakeRTagsPlugin()
 
 
     def fzf(self, source, sink) -> None:
@@ -48,15 +50,15 @@ call fzf#run(fzf#wrap({{
 
     @neovim.command('CMakeProjectSetup', sync=False)
     def run_cmake_setup_rtags(self):
-        removeOldCMakeFiles()
+        self.util.removeOldCMakeFiles()
         if cmake_build_info["build_dir"].is_dir():
-            removeDirtyDir()
+            self.util.removeDirtyDir()
 
         if cmake_build_info["cmake_proj"].is_file():
             self.vim.command('echo "Starting CMake Project"')
-            run_cmake()
-            setup_rtags_daemon()
-            connect_rtags_client()
+            self.util.run_cmake()
+            self.util.setup_rtags_daemon()
+            self.util.connect_rtags_client()
             for plugin, cmd in self.plugin_cmd_info.items():
                 self.vim.command(cmd)
         else:
@@ -64,13 +66,13 @@ call fzf#run(fzf#wrap({{
 
     @neovim.command('CMakeProjectTeardown', sync=False)
     def run_cmake_teardown_rtags(self):
-        shutdown_rtags_daemon()
+        self.util.shutdown_rtags_daemon()
 
     @neovim.command('CMakeProjectSetFile', nargs='1', sync=True)
     def run_rtags_set_file(self, arg):
-        rtags_set_file(arg)
+        self.util.rtags_set_file(arg)
 
     @neovim.command('CMakeProjectUpdateBuffers', sync=False)
     def run_update_rtags_buffers(self):
         buffers = self.vim.buffers
-        update_rtags_buffers(buffers)
+        self.util.update_rtags_buffers(buffers)
