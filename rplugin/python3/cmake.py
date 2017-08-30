@@ -244,7 +244,7 @@ call fzf#run(fzf#wrap({{
 """.replace("\n", "").format(json.dumps(source), sink))
         self.nvim.async_call(self.nvim.feedkeys, "i")
 
-    @neovim.function('fzf#rtags#source')
+    @neovim.function('fzf_rtags_source')
     def fzf_rtags_source(self, args):
         retVal = []
         cmd = []
