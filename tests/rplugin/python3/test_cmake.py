@@ -1,4 +1,4 @@
-from rplugin.python3 import cmake
+from rplugin.python3.cmake import cmake
 import unittest
 import pathlib
 import neovim
