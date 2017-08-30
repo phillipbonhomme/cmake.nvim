@@ -55,6 +55,9 @@ class TestCMake(unittest.TestCase):
         except OSError:
             print("Test Error: Couldn't cd into testing directory.")
             raise
+        self.plugin = cmake.CMakeRTagsPlugin()
+        self.cmake_cmd_info = self.plugin.cmake_cmd_info
+        self.cmake_build_info = self.plugin.cmake_build_info
 
     def tearDown(self):
         print("Teardown for CMake unit test")
@@ -63,7 +66,7 @@ class TestCMake(unittest.TestCase):
         except OSError:
             print("Test Error: Couldn't cd out of test directory")
             raise
-        subprocess.call(cmake.cmake_cmd_info["rtags_shutdwn"])
+        subprocess.call(self.cmake_cmd_info["rtags_shutdwn"])
         #self.nvimproc.terminate()
         #del os.environ["NVIM_LISTEN_ADDRESS"]
         #if nvim_remote_socket.is_file():
@@ -75,10 +78,10 @@ class TestCMake(unittest.TestCase):
         except OSError:
             print("Test Error: Couldn't cd into 'clean' test directory.")
             raise
-        self.assertFalse(cmake.cmake_build_info["build_dir"].is_dir())
-        for path in cmake.cmake_build_info["old_cmake_files"]:
+        self.assertFalse(self.cmake_build_info["build_dir"].is_dir())
+        for path in self.cmake_build_info["old_cmake_files"]:
             self.assertFalse(path.is_file())
-        self.assertFalse(cmake.cmake_build_info["old_cmake_dir"].is_dir())
+        self.assertFalse(self.cmake_build_info["old_cmake_dir"].is_dir())
 
     def test_initDirty(self):
         try:
@@ -87,12 +90,12 @@ class TestCMake(unittest.TestCase):
             print("Test Error: Couldn't cd into 'dirty' test directory.")
             raise
         try:
-            os.chdir(str(cmake.cmake_build_info["build_dir"]))
+            os.chdir(str(self.cmake_build_info["build_dir"]))
         except OSError:
             print("Test Error: Couldn't cd into build directory")
             raise
-        self.assertTrue(cmake.cmake_build_info["old_cmake_dir"].is_dir())
-        for path in cmake.cmake_build_info["old_cmake_files"]:
+        self.assertTrue(self.cmake_build_info["old_cmake_dir"].is_dir())
+        for path in self.cmake_build_info["old_cmake_files"]:
             if path != pathlib.Path("compile_commands.json"):
                 self.assertTrue(path.is_file())
 
@@ -102,11 +105,11 @@ class TestCMake(unittest.TestCase):
         except OSError:
             print("Test Error: Couldn't cd into 'dirty' test directory.")
             raise
-        self.assertFalse(cmake.cmake_build_info["build_dir"].is_dir())
-        cmake.setup_rtags_daemon()
+        self.assertFalse(self.cmake_build_info["build_dir"].is_dir())
+        self.plugin.setup_rtags_daemon()
         try:
             rtags_daemon_status = subprocess.check_output(
-                cmake.cmake_cmd_info["rtags_status"])
+                self.cmake_cmd_info["rtags_status"])
         except subprocess.CalledProcessError as e:
             print(e.output)
         self.assertTrue(
@@ -119,11 +122,11 @@ class TestCMake(unittest.TestCase):
         except OSError:
             print("Test Error: Couldn't cd into 'dirty' test directory.")
             raise
-        self.assertTrue(cmake.cmake_build_info["build_dir"].is_dir())
-        cmake.setup_rtags_daemon()
+        self.assertTrue(self.cmake_build_info["build_dir"].is_dir())
+        self.plugin.setup_rtags_daemon()
         try:
             rtags_daemon_status = subprocess.check_output(
-                cmake.cmake_cmd_info["rtags_status"])
+                self.cmake_cmd_info["rtags_status"])
         except subprocess.CalledProcessError as e:
             print(e.output)
         self.assertTrue(
@@ -136,20 +139,20 @@ class TestCMake(unittest.TestCase):
         except OSError:
             print("Test Error: Couldn't cd into 'dirty' test directory.")
             raise
-        self.assertTrue(cmake.cmake_build_info["build_dir"].is_dir())
-        self.assertTrue(cmake.cmake_build_info["comp_data_cmake"].is_file())
-        cmake.setup_rtags_daemon()
-        cmake.connect_rtags_client()
+        self.assertTrue(self.cmake_build_info["build_dir"].is_dir())
+        self.assertTrue(self.cmake_build_info["comp_data_cmake"].is_file())
+        self.plugin.setup_rtags_daemon()
+        self.plugin.connect_rtags_client()
         try:
             rtags_client_status = subprocess.check_output(
-                cmake.cmake_cmd_info["rtags_file_status"] +
+                self.cmake_cmd_info["rtags_file_status"] +
                 [str(src_info["cpp"])])
         except subprocess.CalledProcessError as e:
             print(e.output)
         self.assertTrue(str(rtags_client_status).find("managed"))
         try:
             rtags_client_status = subprocess.check_output(
-                cmake.cmake_cmd_info["rtags_file_status"] +
+                self.cmake_cmd_info["rtags_file_status"] +
                 [str(src_info["test_cpp"])])
         except subprocess.CalledProcessError as e:
             print(e.output)
@@ -161,14 +164,14 @@ class TestCMake(unittest.TestCase):
         except OSError:
             print("Test Error: Couldn't cd into 'dirty' test directory.")
             raise
-        self.assertTrue(cmake.cmake_build_info["build_dir"].is_dir())
-        self.assertTrue(cmake.cmake_build_info["comp_data_cmake"].is_file())
-        cmake.setup_rtags_daemon()
-        cmake.connect_rtags_client()
-        cmake.rtags_set_file([str(src_info["cpp"])])
+        self.assertTrue(self.cmake_build_info["build_dir"].is_dir())
+        self.assertTrue(self.cmake_build_info["comp_data_cmake"].is_file())
+        self.plugin.setup_rtags_daemon()
+        self.plugin.connect_rtags_client()
+        self.plugin.rtags_set_file([str(src_info["cpp"])])
         try:
             rtags_client_status = subprocess.check_output(
-                cmake.cmake_cmd_info["rtags_file_status"] +
+                self.cmake_cmd_info["rtags_file_status"] +
                 [str(src_info["cpp"])])
         except subprocess.CalledProcessError as e:
             print(e.output)
@@ -180,16 +183,16 @@ class TestCMake(unittest.TestCase):
         except OSError:
             print("Test Error: Couldn't cd into 'dirty' test directory.")
             raise
-        self.assertTrue(cmake.cmake_build_info["build_dir"].is_dir())
-        self.assertTrue(cmake.cmake_build_info["comp_data_cmake"].is_file())
-        cmake.setup_rtags_daemon()
-        cmake.connect_rtags_client()
-        cmake.update_rtags_buffers(
+        self.assertTrue(self.cmake_build_info["build_dir"].is_dir())
+        self.assertTrue(self.cmake_build_info["comp_data_cmake"].is_file())
+        self.plugin.setup_rtags_daemon()
+        self.plugin.connect_rtags_client()
+        self.plugin.update_rtags_buffers(
             [str(src_info["test_cpp"]),
              str(src_info["cpp"])])
         try:
             rtags_client_status = subprocess.check_output(
-                cmake.cmake_cmd_info["rtags_buffers"])
+                self.cmake_cmd_info["rtags_buffers"])
         except subprocess.CalledProcessError as e:
             print(e.output)
         filepath = os.getcwd() + str(src_info["test_cpp"])
@@ -201,16 +204,16 @@ class TestCMake(unittest.TestCase):
         except OSError:
             print("Test Error: Couldn't cd into 'dirty' test directory.")
             raise
-        self.assertTrue(cmake.cmake_build_info["build_dir"].is_dir())
-        self.assertTrue(cmake.cmake_build_info["comp_data_cmake"].is_file())
-        cmake.setup_rtags_daemon()
-        cmake.connect_rtags_client()
-        cmake.update_rtags_buffers(
+        self.assertTrue(self.cmake_build_info["build_dir"].is_dir())
+        self.assertTrue(self.cmake_build_info["comp_data_cmake"].is_file())
+        self.plugin.setup_rtags_daemon()
+        self.plugin.connect_rtags_client()
+        self.plugin.update_rtags_buffers(
             [str(src_info["test_cpp"]),
              str(src_info["cpp"])])
         try:
             rtags_client_status = subprocess.check_output(
-                cmake.cmake_cmd_info["rtags_buffers"])
+                self.cmake_cmd_info["rtags_buffers"])
         except subprocess.CalledProcessError as e:
             print(e.output)
 
