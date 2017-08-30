@@ -16,3 +16,5 @@
   function! CMakeTargets()
       echo "Get CMake Targets"
   endfunction
+" Shutdown Command
+  autocmd VimLeave * :CMakeProjectTeardown

@@ -28,7 +28,7 @@ endfunction
 
 function! s:rtags_gotodefdecl_source()
   let lines = map(map(split(system(
-    \ 'rc --absolute-path --follow-location ' . s:getCurrentLocation()),
+    \ 'rc --absolute-path --containing-function --follow-location ' . s:getCurrentLocation()),
     \ "\n"), 'split(v:val, "\t")'), 'reverse(v:val)')
   if v:shell_error
     throw 'error from rtags client'
@@ -37,7 +37,7 @@ function! s:rtags_gotodefdecl_source()
 endfunction
 function! s:rtags_findreferences_source()
   let lines = map(map(split(system(
-    \ 'rc --absolute-path --wildcard-symbol-names --all-references --references-name ' . expand("<cword>")),
+    \ 'rc --absolute-path --wildcard-symbol-names --all-references --containing-function --references-name ' . expand("<cword>")),
     \ "\n"), 'split(v:val, "\t")'), 'reverse(v:val)')
   if v:shell_error
     throw 'error from rtags client'
@@ -46,7 +46,7 @@ function! s:rtags_findreferences_source()
 endfunction
 function! s:rtags_findsymbols_source()
   let lines = map(map(split(system(
-    \ 'rc --absolute-path --wildcard-symbol-names --cursor-kind --find-symbols "*"'),
+    \ 'rc --absolute-path --wildcard-symbol-names --containing-function --cursor-kind --find-symbols "*"'),
     \ "\n"), 'split(v:val, "\t")'), 'reverse(v:val)')
   if v:shell_error
     throw 'error from rtags client'
@@ -70,9 +70,10 @@ function! s:rtags_sink(line)
   let filename=split(fileLine,":")[0]
   let linenumber=split(fileLine,":")[1]
   let columnnumber=split(fileLine,":")[2]
-  execute "edit " . filename
-  execute "normal " . linenumber . "G" . columnnumber . "|"
-  "execute "edit +" . linenumber . " " . filename
+  "execute "edit " . filename
+  "execute "normal " . linenumber . "G" . columnnumber . "|"
+  execute "edit +" . linenumber . " " . filename
+  call cursor(linenumber, columnnumber)
 endfunction
 
 function! s:rtags_gotodefdecl()

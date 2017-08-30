@@ -1,4 +1,5 @@
 import neovim
+import json
 from pathlib import Path
 import subprocess
 
@@ -31,9 +32,21 @@ cmake_cmd_info = {
     "rtags_status": ["rc", "--status"],
     "rtags_file_status": ["rc", "--is-indexed"],
     "rtags_shutdwn": ["rc", "--quit-rdm"],
-    "rtags_buffer": ["rc", "--set-buffer"],
+    "rtags_buffer": ["rc", "--set-buffers"],
     "rtags_buffers": ["rc", "--list-buffers"],
     "rtags_file": ["rc", "--current-file"],
+    "rtags_goto": [
+        "rc", "--absolute-path", "--containing-function", "--follow-location"
+    ],
+    "rtags_ref": [
+        "rc", "--absolute-path", "--wildcard-symbol-names", "--all-references",
+        "--containing-function", "--references-name"
+    ],
+    "rtags_sym": [
+        "rc", "--absolute-path,"
+        "--wildcard-symbol-names", "--containing-function", "--cursor-kind",
+        "--find-symbols \"*\""
+    ],
     "rc_cmd": ["rc", "-J", str(cmake_build_info["build_dir"])]
 }
 
@@ -161,10 +174,95 @@ def update_rtags_buffers(args):
         print(e.output)
 
 
+def format_rtags(tag):
+    """
+    Tag Format:
+    tag[-1] moderncpp_unittest/c3/18/Tweet.h:25:4:
+    tag[-2] Tweet(const std::string& message="",
+    tag[-3] Tweet::Tweet
+    tag[-4] CXXConstructor
+    tag[-5] function: class Tweet
+    """
+
+    tag_type = len(tag)
+    funcstr = ""
+    typestr = ""
+    namestr = ""
+    linecodestr = ""
+    filepathstr = ""
+    if tag_type is 2:
+        linecodestr = tag[0]
+        filepathstr = tag[1]
+    elif tag_type is 3:
+        func = tag[0]
+        funcstr = func.split(" ", 1)[1]
+        linecodestr = tag[-2]
+        filepathstr = tag[-1]
+    elif tag_type is 4:
+        typestr = tag[0]
+        namestr = tag[1]
+        linecodestr = tag[-2]
+        filepathstr = tag[-1]
+    elif tag_type is 5:
+        func = tag[0]
+        funcstr = func.split(" ", 1)[1]
+        typestr = tag[1]
+        namestr = tag[2]
+        linecodestr = tag[-2]
+        filepathstr = tag[-1]
+    tagstr = [typestr, namestr, funcstr, linecodestr, filepathstr]
+    return '\t'.join(tagstr)
+
+
+def rtags_tagrun(cmd):
+    try:
+        tagrun = subprocess.check_output(cmd, stderr=subprocess.DEVNULL)
+    except subprocess.CalledProcessError as e:
+        print(e.output)
+    taglines = tagrun.split("\n")
+    tags = map(split("\t"), taglines)
+    tags[:] = map(reverse(), tags)
+    tags[:] = map(format_rtags, tags)
+    return tags
+
+
 @neovim.plugin
 class CMakeRTagsProject(object):
     def __init__(self, vim):
         self.vim = vim
+        if self.vim.vars.get("loaded_fzf") == 1:
+            self.selectionUI = "fzf"
+        else:
+            self.selectionUI = "location-list"
+
+    def fzf(self, source, sink) -> None:
+        self.asyncCommand("""
+call fzf#run(fzf#wrap({{
+    'source': {},
+    'sink': function('{}')
+    }}))
+""".replace("\n", "").format(json.dumps(source), sink))
+        self.nvim.async_call(self.nvim.feedkeys, "i")
+
+    @neovim.function('fzf#rtags#source')
+    def fzf_rtags_source(self, args):
+        retVal = []
+        cmd = []
+        if str(args).find("goto"):
+            cursor = self.vim.command('getpos(\'.\')')
+            cmd = cmake_cmd_info["rtags_goto"]
+            cmd.extend(
+                [self.vim.command('expand(\'%:p\')') + cursor[1] + cursor[2]])
+        elif str(args).find("ref"):
+            cursor = self.vim.command('expand("<cword>")')
+            cmd = cmake_cmd_info["rtags_ref"]
+            cmd.extend([cursor])
+        elif str(args).find("sym"):
+            cmd = cmake_cmd_info["rtags_sym"]
+        else:
+            return None
+        retVal = rtags_tagrun(cmd)
+        return retVal
 
     @neovim.command('CMakeProjectSetup', sync=False)
     def run_cmake_setup_rtags(self):
