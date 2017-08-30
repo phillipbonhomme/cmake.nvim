@@ -16,7 +16,7 @@ class CMakeRTagsProject(object):
             "chromatica": "ChromaticaStart",
             "deoplete": "call deoplete#enable()"
         }
-        self.util = CMakeRTagsPlugin()
+        self.util = cmake.CMakeRTagsPlugin()
 
 
     def fzf(self, source, sink) -> None:
