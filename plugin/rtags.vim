@@ -113,6 +113,10 @@ function! s:rtags_findsymbols()
   endtry
 endfunction
 
-command! RTagsGoTo call s:rtags_gotodefdecl()
-command! RTagsFindRefs call s:rtags_findreferences()
-command! RTagsFindSymbol call s:rtags_findsymbols()
+"command! RTagsGoTo call s:rtags_gotodefdecl()
+"command! RTagsFindRefs call s:rtags_findreferences()
+"command! RTagsFindSymbol call s:rtags_findsymbols()
+"command! -bang -nargs=* Tags call fzf#vim#tags(<q-args>, {'options': '-n1'}, <bang>0)
+command! -bang -nargs=* RTagsGoTo call fzf#vim#rtags("goto", <q-args>)
+command! -bang -nargs=* RTagsFindRefs call fzf#vim#rtags("goto", <q-args>)
+command! -bang -nargs=* RTagsFindSymbol call fzf#vim#rtags("goto", <q-args>)
