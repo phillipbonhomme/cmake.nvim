@@ -1,8 +1,7 @@
 import neovim
 import json
-from pathlib import Path
-import subprocess
 import cmake
+
 
 @neovim.plugin
 class CMakeRTagsProject(object):
@@ -17,7 +16,6 @@ class CMakeRTagsProject(object):
             "deoplete": "call deoplete#enable()"
         }
         self.util = cmake.CMakeRTagsPlugin()
-
 
     def fzf(self, source, sink) -> None:
         self.asyncCommand("""
