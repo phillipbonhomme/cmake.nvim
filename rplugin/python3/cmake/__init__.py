@@ -1,6 +1,6 @@
 import neovim
 import json
-import cmake
+from ..rtags import rtags
 
 
 @neovim.plugin
@@ -15,7 +15,7 @@ class CMakeRTagsProject(object):
             "chromatica": "ChromaticaStart",
             "deoplete": "call deoplete#enable()"
         }
-        self.util = cmake.CMakeRTagsPlugin()
+        self.util = rtags.CMakeRTagsPlugin()
 
     def fzf(self, source, sink) -> None:
         self.asyncCommand("""
@@ -32,27 +32,27 @@ call fzf#run(fzf#wrap({{
         cmd = []
         if str(args).find("goto"):
             cursor = self.vim.command('getpos(\'.\')')
-            cmd = cmake_cmd_info["rtags_goto"]
+            cmd = self.util.cmake_cmd_info["rtags_goto"]
             cmd.extend(
                 [self.vim.command('expand(\'%:p\')') + cursor[1] + cursor[2]])
         elif str(args).find("ref"):
             cursor = self.vim.command('expand("<cword>")')
-            cmd = cmake_cmd_info["rtags_ref"]
+            cmd = self.util.cmake_cmd_info["rtags_ref"]
             cmd.extend([cursor])
         elif str(args).find("sym"):
-            cmd = cmake_cmd_info["rtags_sym"]
+            cmd = self.util.cmake_cmd_info["rtags_sym"]
         else:
             return None
-        retVal = rtags_tagrun(cmd)
+        retVal = self.util.rtags_tagrun(cmd)
         return retVal
 
     @neovim.command('CMakeProjectSetup', sync=False)
     def run_cmake_setup_rtags(self):
         self.util.removeOldCMakeFiles()
-        if cmake_build_info["build_dir"].is_dir():
+        if self.util.cmake_build_info["build_dir"].is_dir():
             self.util.removeDirtyDir()
 
-        if cmake_build_info["cmake_proj"].is_file():
+        if self.util.cmake_build_info["cmake_proj"].is_file():
             self.vim.command('echo "Starting CMake Project"')
             self.util.run_cmake()
             self.util.setup_rtags_daemon()
