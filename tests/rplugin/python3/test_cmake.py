@@ -1,5 +1,5 @@
-from rplugin.python3.cmake import *
-from rplugin.python3.rtags import *
+import rplugin.python3.cmake
+import rplugin.python3.rtags
 import unittest
 import pathlib
 import neovim
@@ -56,7 +56,7 @@ class TestCMake(unittest.TestCase):
         except OSError:
             print("Test Error: Couldn't cd into testing directory.")
             raise
-        self.plugin = cmake.CMakeRTagsPlugin()
+        self.plugin = rplugin.python3.rtags.rtags.CMakeRTagsPlugin()
         self.cmake_cmd_info = self.plugin.cmake_cmd_info
         self.cmake_build_info = self.plugin.cmake_build_info
 
